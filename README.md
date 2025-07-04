@@ -1,4 +1,4 @@
-# The Zeitgeist Engine
+# Ripple Effect Analysis
 
 "The Zeitgeist Engine" is a web application designed to automate the "Ripple Effect Analysis" framework. It allows users to input an emerging technology and receive a structured analysis of its direct consequences, human-societal reactions, and potential business opportunities.
 
