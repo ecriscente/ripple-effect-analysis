@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
+import { marked } from 'marked';
 
 // Define the structure of the analysis response
 interface AnalysisSection {
@@ -20,10 +21,10 @@ function App() {
   const [error, setError] = useState('');
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
 
-  const handleCopy = async (text: string) => {
+  const handleCopy = async (text: string, section: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      setCopiedSection(text);
+      setCopiedSection(section);
       setTimeout(() => setCopiedSection(null), 2000); // Reset after 2 seconds
     } catch (err) {
       console.error('Failed to copy:', err);
@@ -75,6 +76,11 @@ function App() {
           type="text"
           value={technology}
           onChange={(e) => setTechnology(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleAnalyze();
+            }
+          }}
           placeholder="Enter an emerging technology (e.g., 'Quantum Computing')"
         />
         <button onClick={handleAnalyze} disabled={isLoading}>
@@ -91,27 +97,27 @@ function App() {
           <div className="result-section">
             <div className="section-header">
               <h2>{analysis.primary_ripples.title}</h2>
-              <button onClick={() => handleCopy(analysis.primary_ripples.points.join('\n'))}>
+              <button onClick={() => handleCopy(analysis.primary_ripples.points.join('\n'), 'primary')}>
                 {copiedSection === 'primary' ? 'Copied!' : 'Copy'}
               </button>
             </div>
             <ul>
               {analysis.primary_ripples.points.map((point, index) => (
-                <li key={index} dangerouslySetInnerHTML={{ __html: point }}></li>
-              ))}
+                <li key={index} dangerouslySetInnerHTML={{ __html: point.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}></li>
+              ))} 
             </ul>
           </div>
 
           <div className="result-section">
             <div className="section-header">
               <h2>{analysis.secondary_ripples.title}</h2>
-              <button onClick={() => handleCopy(analysis.secondary_ripples.points.join('\n'))}>
+              <button onClick={() => handleCopy(analysis.secondary_ripples.points.join('\n'), 'secondary')}>
                 {copiedSection === 'secondary' ? 'Copied!' : 'Copy'}
               </button>
             </div>
             <ul>
               {analysis.secondary_ripples.points.map((point, index) => (
-                <li key={index} dangerouslySetInnerHTML={{ __html: point }}></li>
+                <li key={index} dangerouslySetInnerHTML={{ __html: point.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}></li>
               ))}
             </ul>
           </div>
@@ -119,13 +125,13 @@ function App() {
           <div className="result-section">
             <div className="section-header">
               <h2>{analysis.synthesis.title}</h2>
-              <button onClick={() => handleCopy(analysis.synthesis.points.join('\n'))}>
+              <button onClick={() => handleCopy(analysis.synthesis.points.join('\n'), 'synthesis')}>
                 {copiedSection === 'synthesis' ? 'Copied!' : 'Copy'}
               </button>
             </div>
             <ul>
               {analysis.synthesis.points.map((point, index) => (
-                <li key={index} dangerouslySetInnerHTML={{ __html: point }}></li>
+                <li key={index} dangerouslySetInnerHTML={{ __html: point.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}></li>
               ))}
             </ul>
           </div>

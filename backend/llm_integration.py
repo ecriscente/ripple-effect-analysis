@@ -78,11 +78,6 @@ def get_analysis(technology: str):
         response3 = model.generate_content(prompt3_synthesis)
         synthesis_points = parse_llm_response(response3.text)
 
-    except genai.APIError as e:
-        print(f"LLM API Error: {e}")
-        primary_ripples_points = ["Error: Could not retrieve primary ripples. Please try again later."]
-        secondary_ripples_points = ["Error: Could not retrieve secondary ripples. Please try again later."]
-        synthesis_points = ["Error: Could not retrieve synthesis. Please try again later."]
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         primary_ripples_points = ["Error: An unexpected error occurred. Please try again later."]
