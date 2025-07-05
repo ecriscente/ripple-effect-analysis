@@ -2,10 +2,10 @@
 
 ## High-Priority User Features
 
-- [ ] **Improved UI/UX with Tailwind CSS:**
+- [x] **Improved UI/UX with Tailwind CSS:**
   - [x] Implement a modern and responsive design.
-- [ ] **User Accounts & History:**
-  - [ ] Implement user registration and login.
+- [x] **User Accounts & History:**
+  - [x] Implement user registration and login (with JWT authentication).
   - [ ] Create a database schema to store user information and their analysis history.
   - [ ] Build a dashboard for users to view their past analyses.
 

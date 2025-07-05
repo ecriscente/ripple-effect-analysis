@@ -22,3 +22,5 @@ We have successfully built a Minimum Viable Product (MVP) with a React/TypeScrip
 ## Next Steps
 
 The next steps involve refining the product for monetization. This includes improving the quality of the LLM-generated analysis, enhancing the user experience (e.g., saving analyses, user accounts), and exploring different monetization models (e.g., subscription tiers, pay-per-use). The `TODO.md` file should be updated to reflect these new goals.
+
+**Development Principle:** When adding new libraries or dependencies to the project, always prioritize using the latest stable versions available for both frontend and backend components. This ensures access to the latest features, security patches, and performance improvements.
