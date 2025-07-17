@@ -1,29 +1,28 @@
-# Ripple Effect Analysis - Phase 2 TODO
+# The Zeitgeist Engine - Phase 2 TODO
 
-## High-Priority User Features
+## The Strategic Hub
 
-- [x] **Improved UI/UX with Tailwind CSS:**
-  - [x] Implement a modern and responsive design.
-- [x] **User Accounts & History:**
-  - [x] Implement user registration and login (with JWT authentication).
-  - [ ] Create a database schema to store user information and their analysis history.
-  - [ ] Build a dashboard for users to view their past analyses.
+- [ ] **Database Schema:** Design and implement the database schema to store user analyses, including the technology name, the generated report, and a custom title.
+- [ ] **Backend Logic:** Connect the analysis generation in `main.py` to the user's account so that every report is automatically saved to the new database table.
+- [ ] **Frontend Dashboard:** Build the user dashboard page where users can see a list of their past analyses, click to view them, and give them custom, memorable titles.
 
-- [ ] **Sharing & Exporting:**
-  - [ ] Generate unique, shareable links for each analysis report.
-  - [ ] Add functionality to export reports to Markdown.
-  - [ ] (Optional) Add PDF export functionality.
+## The Collaborative Catalyst
+
+- [ ] **Sharable Links:**
+  - [ ] **Backend:** Create a new API endpoint that retrieves a specific analysis by a unique ID.
+  - [ ] **Frontend:** Create a new route/page that displays a specific analysis based on the ID in the URL.
+  - [ ] **Frontend:** Add a "Share" button to the results page that copies the unique link to the clipboard.
+- [ ] **Simple Export:**
+  - [ ] **Frontend:** Add a "Copy for Email" button that copies a clean, text-only version of the full report to the clipboard.
 
 ## Technical & UX Refinements
 
-- [ ] **Prompt Management:**
-  - [ ] Move the master prompts from `llm_integration.py` into separate template files for easier management.
+- [ ] **Prompt Management:** Move the master prompts from `llm_integration.py` into separate, non-public template files for easier internal management and optimization.
+- [ ] **UI/UX Polish:** Continuously refine the user interface based on feedback, with a focus on the new dashboard and sharing features.
+- [ ] **Dark Mode:** Add a dark mode option to the UI.
 
-- [ ] **Frontend Enhancements:**
-  - [ ] Further refine the UI and UX based on user feedback.
-  - [ ] Add a dark mode option.
+## Deployment
 
-- [ ] **Deployment:**
-  - [ ] Create a production build of the frontend.
-  - [ ] Configure a production-ready web server (e.g., Gunicorn) for the FastAPI backend.
-  - [ ] Deploy the application to a cloud provider (e.g., Vercel, Netlify, Heroku).
+- [ ] Create a production build of the frontend.
+- [ ] Configure a production-ready web server (e.g., Gunicorn) for the FastAPI backend.
+- [ ] Deploy the application to a cloud provider (e.g., Vercel, Netlify, Heroku).
