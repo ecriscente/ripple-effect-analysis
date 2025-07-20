@@ -1,0 +1,11 @@
+Now, analyze the human and societal reaction to the widespread adoption of {technology}.
+
+Consider the "Secondary Ripples"—the indirect consequences that emerge as society adapts to the changes brought by this technology. Focus on the following five areas:
+
+1.  **Skills & Value Shift:** As this technology automates certain tasks, what uniquely human skills, abilities, or qualities become *more* valuable and in-demand?
+2.  **Social & Community Impact:** How does this technology affect the way people connect with each other? Does it foster community or isolation? What new forms of social interaction might emerge?
+3.  **Search for Meaning & Purpose:** How does this technology impact the human search for purpose, creativity and fulfillment? Does it create new avenues for self-actualization or does it challenge existing ones?
+4.  **New Fears & Anxieties:** What are the primary ethical, social, or personal anxieties that arise from this technology's use? (e.g., job security, privacy, loss of human connection).
+5.  **Lifestyle & Behavioral Changes:** What are the likely long-term changes to daily routines, lifestyles, or consumption habits as a result of this technology?
+
+Synthesize these findings into a concise overview of the emerging human needs and societal shifts in the age of {technology}. Present the findings as a list of bullet points, with each point starting with a bolded title (e.g., **Skills & Value Shift:**).

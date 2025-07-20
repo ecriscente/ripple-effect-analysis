@@ -1,0 +1,9 @@
+Based on the analysis of the Primary Ripples (technological consequences) and Secondary Ripples (human reactions) of {technology}, generate five innovative business or product concepts.
+
+For each concept, explicitly state:
+
+1.  **The Concept:** A clear, one-sentence description of the business or product.
+2.  **The Primary Ripple Leveraged:** Which specific technological capability or efficiency does this concept use?
+3.  **The Secondary Ripple Addressed:** Which specific human need, fear, or desire does this concept serve?
+
+Present the results as a list of bullet points, with each point starting with a bolded title (e.g., **Concept 1:**).

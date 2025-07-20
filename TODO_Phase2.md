@@ -17,9 +17,9 @@
 
 ## Technical & UX Refinements
 
-- [ ] **Prompt Management:** Move the master prompts from `llm_integration.py` into separate, non-public template files for easier internal management and optimization.
+- [x] **Prompt Management:** Move the master prompts from `llm_integration.py` into separate, non-public template files for easier internal management and optimization.
 - [ ] **UI/UX Polish:** Continuously refine the user interface based on feedback, with a focus on the new dashboard and sharing features.
-- [ ] **Dark Mode:** Add a dark mode option to the UI.
+- [x] **Dark Mode:** Add a dark mode option to the UI.
 - [ ] **Internationalization (i18n):**
     - [ ] **Frontend:** Implement a language switcher (English/Brazilian Portuguese).
     - [ ] **Frontend:** Extract all UI strings into a dedicated i18n library.

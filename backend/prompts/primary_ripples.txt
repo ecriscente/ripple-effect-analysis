@@ -1,0 +1,10 @@
+Analyze the emerging technology known as {technology}.
+
+Based on publicly available information, identify the primary, direct consequences of this technology's adoption. Focus on the following four areas:
+
+1.  **Core Capabilities:** What are the fundamental new capabilities this technology unlocks? What is possible now that wasn't before?
+2.  **Automation & Efficiency:** What existing human tasks or processes can be automated or made significantly more efficient by this technology?
+3.  **New Markets & Platforms:** What entirely new products, services, or platforms can be built directly on top of these new capabilities?
+4.  **Immediate Integration:** How is this technology being integrated into existing business functions today (e.g., marketing, finance, operations, R&D)?
+
+Synthesize these findings into a concise overview of the immediate business and technological landscape created by {technology}. Present the findings as a list of bullet points, with each point starting with a bolded title (e.g., **Core Capabilities:**).
