@@ -23,8 +23,8 @@ const Navbar = ({ isAuthenticated, handleLogout, theme, toggleTheme }: NavbarPro
     setIsOpen(false);
   };
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
+  const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    i18n.changeLanguage(event.target.value);
     closeMenu(); // Close menu after language selection
   };
 
@@ -70,12 +70,10 @@ const Navbar = ({ isAuthenticated, handleLogout, theme, toggleTheme }: NavbarPro
         <button onClick={toggleTheme} className="theme-toggle-button">
           {theme === 'light' ? t('darkMode') : t('lightMode')}
         </button>
-        <button onClick={() => changeLanguage('en')} className="theme-toggle-button">
-          EN
-        </button>
-        <button onClick={() => changeLanguage('pt')} className="theme-toggle-button">
-          PT
-        </button>
+        <select onChange={handleLanguageChange} value={i18n.language} className="language-select">
+          <option value="en">English</option>
+          <option value="pt">Português</option>
+        </select>
       </div>
     </nav>
   );

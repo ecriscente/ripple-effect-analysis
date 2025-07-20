@@ -1,152 +1,162 @@
-import sqlite3
+import os
 import json
+import psycopg
 from passlib.context import CryptContext
+from psycopg import errors
 
-DATABASE_URL = "zeitgeist.db"
+# Database connection details from environment variables
+DB_NAME = os.getenv("POSTGRES_DB", "zeitgeist_db")
+DB_USER = os.getenv("POSTGRES_USER", "user")
+DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "password")
+DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
+DB_PORT = os.getenv("POSTGRES_PORT", "5432")
+
+# Connection string
+DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def get_db():
-    conn = sqlite3.connect(DATABASE_URL)
-    return conn
+    return psycopg.connect(DATABASE_URL)
 
 def create_user_table():
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute(
-        '''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT NOT NULL UNIQUE,
-            hashed_password TEXT NOT NULL
-        )
-        '''
-    )
-    conn.commit()
-    conn.close()
+    with get_db() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                '''
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    email TEXT NOT NULL UNIQUE,
+                    hashed_password TEXT NOT NULL
+                )
+                '''
+            )
+        conn.commit()
 
 def create_user(email, password):
-    conn = get_db()
-    cursor = conn.cursor()
     hashed_password = pwd_context.hash(password)
-    try:
-        cursor.execute(
-            "INSERT INTO users (email, hashed_password) VALUES (?, ?)",
-            (email, hashed_password),
-        )
-        conn.commit()
-    except sqlite3.IntegrityError:
-        return None  # User already exists
-    finally:
-        conn.close()
-    return get_user(email)
+    with get_db() as conn:
+        with conn.cursor() as cursor:
+            try:
+                cursor.execute(
+                    "INSERT INTO users (email, hashed_password) VALUES (%s, %s) RETURNING id, email",
+                    (email, hashed_password),
+                )
+                new_user = cursor.fetchone()
+                conn.commit()
+                return new_user
+            except errors.UniqueViolation:
+                conn.rollback()
+                return None  # User already exists
 
 def get_user(email):
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
-    user = cursor.fetchone()
-    conn.close()
-    return user
+    with get_db() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT id, email, hashed_password FROM users WHERE email = %s", (email,))
+            user = cursor.fetchone()
+            return user
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 def create_analysis_table():
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute(
-        '''
-        CREATE TABLE IF NOT EXISTS analyses (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            technology TEXT NOT NULL,
-            primary_ripples_title TEXT NOT NULL,
-            primary_ripples_points TEXT NOT NULL,
-            secondary_ripples_title TEXT NOT NULL,
-            secondary_ripples_points TEXT NOT NULL,
-            synthesis_title TEXT NOT NULL,
-            synthesis_points TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users (id)
-        )
-        '''
-    )
-    conn.commit()
-    conn.close()
+    with get_db() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                '''
+                CREATE TABLE IF NOT EXISTS analyses (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER NOT NULL,
+                    technology TEXT NOT NULL,
+                    primary_ripples_title TEXT NOT NULL,
+                    primary_ripples_points TEXT NOT NULL,
+                    secondary_ripples_title TEXT NOT NULL,
+                    secondary_ripples_points TEXT NOT NULL,
+                    synthesis_title TEXT NOT NULL,
+                    synthesis_points TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users (id)
+                )
+                '''
+            )
+        conn.commit()
 
 def get_analyses_by_user_id(user_id):
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, technology, created_at FROM analyses WHERE user_id = ? ORDER BY created_at DESC", (user_id,))
-    analyses = cursor.fetchall()
-    conn.close()
-    return analyses
+    with get_db() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT id, technology, created_at FROM analyses WHERE user_id = %s ORDER BY created_at DESC", (user_id,))
+            analyses = cursor.fetchall()
+            return analyses
 
 def get_analysis_by_id(analysis_id):
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute(
-        "SELECT user_id, technology, primary_ripples_title, primary_ripples_points, secondary_ripples_title, secondary_ripples_points, synthesis_title, synthesis_points, created_at FROM analyses WHERE id = ?",
-        (analysis_id,)
-    )
-    analysis_row = cursor.fetchone()
-    conn.close()
+    with get_db() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT user_id, technology, primary_ripples_title, primary_ripples_points, secondary_ripples_title, secondary_ripples_points, synthesis_title, synthesis_points, created_at FROM analyses WHERE id = %s",
+                (analysis_id,)
+            )
+            analysis_row = cursor.fetchone()
 
-    if not analysis_row:
-        return None
+            if not analysis_row:
+                return None
 
-    # Reconstruct the nested dictionary structure
-    return {
-        "user_id": analysis_row[0],
-        "technology": analysis_row[1],
-        "primary_ripples": {
-            "title": analysis_row[2],
-            "points": json.loads(analysis_row[3])
-        },
-        "secondary_ripples": {
-            "title": analysis_row[4],
-            "points": json.loads(analysis_row[5])
-        },
-        "synthesis": {
-            "title": analysis_row[6],
-            "points": json.loads(analysis_row[7])
-        },
-        "created_at": analysis_row[8]
-    }
+            # Reconstruct the nested dictionary structure
+            return {
+                "user_id": analysis_row[0],
+                "technology": analysis_row[1],
+                "primary_ripples": {
+                    "title": analysis_row[2],
+                    "points": json.loads(analysis_row[3])
+                },
+                "secondary_ripples": {
+                    "title": analysis_row[4],
+                    "points": json.loads(analysis_row[5])
+                },
+                "synthesis": {
+                    "title": analysis_row[6],
+                    "points": json.loads(analysis_row[7])
+                },
+                "created_at": analysis_row[8]
+            }
 
 def save_analysis(user_id, technology, analysis_data):
-    conn = get_db()
-    cursor = conn.cursor()
-    try:
-        cursor.execute(
-            """
-            INSERT INTO analyses (
-                user_id, technology,
-                primary_ripples_title, primary_ripples_points,
-                secondary_ripples_title, secondary_ripples_points,
-                synthesis_title, synthesis_points
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                user_id,
-                technology,
-                analysis_data['primary_ripples']['title'],
-                json.dumps(analysis_data['primary_ripples']['points']),
-                analysis_data['secondary_ripples']['title'],
-                json.dumps(analysis_data['secondary_ripples']['points']),
-                analysis_data['synthesis']['title'],
-                json.dumps(analysis_data['synthesis']['points']),
-            ),
-        )
-        conn.commit()
-        return cursor.lastrowid
-    except Exception as e:
-        print(f"Database error: {e}")
-        return None
-    finally:
-        conn.close()
+    with get_db() as conn:
+        with conn.cursor() as cursor:
+            try:
+                cursor.execute(
+                    """
+                    INSERT INTO analyses (
+                        user_id, technology,
+                        primary_ripples_title, primary_ripples_points,
+                        secondary_ripples_title, secondary_ripples_points,
+                        synthesis_title, synthesis_points
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
+                    """,
+                    (
+                        user_id,
+                        technology,
+                        analysis_data['primary_ripples']['title'],
+                        json.dumps(analysis_data['primary_ripples']['points']),
+                        analysis_data['secondary_ripples']['title'],
+                        json.dumps(analysis_data['secondary_ripples']['points']),
+                        analysis_data['synthesis']['title'],
+                        json.dumps(analysis_data['synthesis']['points']),
+                    ),
+                )
+                analysis_id = cursor.fetchone()[0]
+                conn.commit()
+                return analysis_id
+            except Exception as e:
+                print(f"Database error: {e}")
+                conn.rollback()
+                return None
 
 if __name__ == "__main__":
-    create_user_table()
-    create_analysis_table()
+    # This block will now attempt to connect to PostgreSQL
+    # Ensure your PostgreSQL server is running (e.g., via docker-compose up)
+    try:
+        create_user_table()
+        create_analysis_table()
+        print("PostgreSQL tables created successfully (if they didn't exist).")
+    except Exception as e:
+        print(f"Error creating PostgreSQL tables: {e}")

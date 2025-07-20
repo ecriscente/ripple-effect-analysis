@@ -62,7 +62,7 @@ GEMINI_API_KEY="your_gemini_api_key_here"
 
 ## Key Implementation Details
 
-- The frontend calls the backend at `http://localhost:8000/api/analyze` (App.tsx:45)
+- The frontend calls the backend at `/api/analyze` (App.tsx:45)
 - Response parsing handles bullet points and markdown formatting (llm_integration.py:18-25)
 - Copy-to-clipboard functionality is implemented for each analysis section
 - Error handling covers both API failures and missing environment variables

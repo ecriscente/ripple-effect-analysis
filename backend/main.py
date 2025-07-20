@@ -11,12 +11,21 @@ from llm_integration import get_analysis
 import database as db
 import auth
 
+from fastapi.responses import HTMLResponse
+
 app = FastAPI()
+
+frontend_ngrok_url = "https://57e6116b1724.ngrok-free.app" # <-- IMPORTANT: Change this
+
+origins = [
+    "http://localhost:5173",  # Your local dev environment
+    frontend_ngrok_url       # Your public frontend
+]
 
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -120,3 +129,18 @@ async def get_single_analysis(analysis_id: int, token: str = Depends(oauth2_sche
         raise HTTPException(status_code=403, detail="Not authorized to view this analysis")
 
     return analysis
+
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    return """
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Zeitgeist Engine API</title>
+      </head>
+      <body>
+        <h1>Zeitgeist Engine API</h1>
+        <p>If you see this page, your backend is running and ngrok can be approved.</p>
+      </body>
+    </html>
+    """

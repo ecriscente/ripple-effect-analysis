@@ -27,9 +27,10 @@ const Dashboard = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:8000/api/analyses', {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/analyses`, {
           headers: {
             'Authorization': `Bearer ${token}`,
+            'ngrok-skip-browser-warning': '1',
           },
         });
 

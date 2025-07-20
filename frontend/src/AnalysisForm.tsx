@@ -40,7 +40,7 @@ const AnalysisForm = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/api/analyze', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
