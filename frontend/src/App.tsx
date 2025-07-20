@@ -80,19 +80,33 @@ The question for every innovator is no longer just "What can this technology do?
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [theme, setTheme] = useState('light');
 
   const checkAuthStatus = () => {
     const token = localStorage.getItem('token');
-    setIsAuthenticated(!!token); // Convert token presence to boolean
+    setIsAuthenticated(!!token);
+  };
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    document.body.classList.toggle('dark-mode', newTheme === 'dark');
   };
 
   useEffect(() => {
     checkAuthStatus();
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+    document.body.classList.toggle('dark-mode', savedTheme === 'dark');
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    checkAuthStatus(); // Update auth status immediately after logout
+    checkAuthStatus();
     window.location.href = '/login';
   };
 
@@ -112,6 +126,9 @@ function App() {
               <Link to="/register">Register</Link>
             </>
           )}
+          <button onClick={toggleTheme} className="theme-toggle-button">
+            {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+          </button>
         </nav>
         <Routes>
           <Route path="/" element={<Home isAuthenticated={isAuthenticated} />} />

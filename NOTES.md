@@ -41,3 +41,4 @@
 - **Prompt Confidentiality & Optimization:** The core "Ripple Effect Analysis" prompts are our most valuable intellectual property and will remain confidential. However, their **continuous optimization** is our highest internal priority to ensure the quality of the analysis remains world-class.
 - **Focus on Workflow Integration:** The platform's success depends on how easily it fits into and enhances the user's existing strategic workflow.
 - **Scalability & Security:** As usage grows, the backend must be scalable and secure, especially with the introduction of user data and billing.
+- **Internationalization (i18n):** The application should be designed to support multiple languages, starting with English and Brazilian Portuguese. This includes both the UI and the AI-generated content.
