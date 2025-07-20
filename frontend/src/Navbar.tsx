@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import i18n from 'i18next';
 
 interface NavbarProps {
   isAuthenticated: boolean;
@@ -11,6 +13,7 @@ interface NavbarProps {
 const Navbar = ({ isAuthenticated, handleLogout, theme, toggleTheme }: NavbarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const navbarRef = useRef<HTMLElement>(null); // Ref for the navbar element
+  const { t } = useTranslation();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -18,6 +21,11 @@ const Navbar = ({ isAuthenticated, handleLogout, theme, toggleTheme }: NavbarPro
 
   const closeMenu = () => {
     setIsOpen(false);
+  };
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    closeMenu(); // Close menu after language selection
   };
 
   useEffect(() => {
@@ -39,7 +47,7 @@ const Navbar = ({ isAuthenticated, handleLogout, theme, toggleTheme }: NavbarPro
   return (
     <nav className="navbar" ref={navbarRef}> {/* Attach ref to the nav element */}
       <div className="navbar-brand">
-        <Link to="/" onClick={closeMenu}>Zeitgeist Engine</Link>
+        <Link to="/" onClick={closeMenu}>{t('zeitgeistEngine')}</Link>
       </div>
       <button className="hamburger-menu" onClick={toggleMenu}>
         <span className="hamburger-icon"></span>
@@ -47,20 +55,26 @@ const Navbar = ({ isAuthenticated, handleLogout, theme, toggleTheme }: NavbarPro
         <span className="hamburger-icon"></span>
       </button>
       <div className={`navbar-links ${isOpen ? 'open' : ''}`}>
-        <Link to="/" onClick={closeMenu}>Home</Link>
+        <Link to="/" onClick={closeMenu}>{t('home')}</Link>
         {isAuthenticated ? (
           <>
-            <Link to="/dashboard" onClick={closeMenu}>Dashboard</Link>
-            <Link to="/" onClick={() => { handleLogout(); closeMenu(); }}>Logout</Link>
+            <Link to="/dashboard" onClick={closeMenu}>{t('dashboard')}</Link>
+            <Link to="/" onClick={() => { handleLogout(); closeMenu(); }}>{t('logout')}</Link>
           </>
         ) : (
           <>
-            <Link to="/login" onClick={closeMenu}>Login</Link>
-            <Link to="/register" onClick={closeMenu}>Register</Link>
+            <Link to="/login" onClick={closeMenu}>{t('login')}</Link>
+            <Link to="/register" onClick={closeMenu}>{t('register')}</Link>
           </>
         )}
         <button onClick={toggleTheme} className="theme-toggle-button">
-          {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+          {theme === 'light' ? t('darkMode') : t('lightMode')}
+        </button>
+        <button onClick={() => changeLanguage('en')} className="theme-toggle-button">
+          EN
+        </button>
+        <button onClick={() => changeLanguage('pt')} className="theme-toggle-button">
+          PT
         </button>
       </div>
     </nav>

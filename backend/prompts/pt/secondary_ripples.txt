@@ -1,0 +1,11 @@
+Agora, analise a reação humana e social à adoção generalizada de {technology}.
+
+Considere as "Ondas Secundárias"—as consequências indiretas que surgem à medida que a sociedade se adapta às mudanças trazidas por esta tecnologia. Concentre-se nas cinco áreas a seguir:
+
+1.  **Mudança de Habilidades e Valores:** À medida que esta tecnologia automatiza certas tarefas, quais habilidades, capacidades ou qualidades unicamente humanas se tornam *mais* valiosas e procuradas?
+2.  **Impacto Social e Comunitário:** Como esta tecnologia afeta a forma como as pessoas se conectam umas com as outras? Ela promove a comunidade ou o isolamento? Que novas formas de interação social podem surgir?
+3.  **Busca por Significado e Propósito:** Como esta tecnologia impacta a busca humana por propósito, criatividade e realização? Ela cria novas avenidas para a auto-realização ou desafia as existentes?
+4.  **Novos Medos e Ansiedades:** Quais são as principais ansiedades éticas, sociais ou pessoais que surgem do uso desta tecnologia? (por exemplo, segurança no emprego, privacidade, perda de conexão humana).
+5.  **Mudanças de Estilo de Vida e Comportamento:** Quais são as prováveis mudanças de longo prazo nas rotinas diárias, estilos de vida ou hábitos de consumo como resultado desta tecnologia?
+
+Sintetize estas descobertas em uma visão geral concisa das necessidades humanas emergentes e das mudanças sociais na era de {technology}. Apresente as descobertas como uma lista de marcadores, com cada marcador começando com um título em negrito (por exemplo, **Mudança de Habilidades e Valores:**).

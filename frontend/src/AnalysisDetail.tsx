@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface AnalysisSection {
   title: string;
@@ -20,6 +21,7 @@ const AnalysisDetail = () => {
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchAnalysis = async () => {
@@ -28,7 +30,7 @@ const AnalysisDetail = () => {
       const token = localStorage.getItem('token');
 
       if (!token) {
-        setError('You must be logged in to view this analysis.');
+        setError(t('mustBeLoggedInViewAnalyses'));
         setIsLoading(false);
         return;
       }
@@ -42,13 +44,13 @@ const AnalysisDetail = () => {
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.detail || 'Failed to fetch analysis.');
+          throw new Error(errorData.detail || t('failedToFetchAnalysis'));
         }
 
         const data: AnalysisData = await response.json();
         setAnalysis(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred.');
+        setError(err instanceof Error ? err.message : t('unknownError'));
       } finally {
         setIsLoading(false);
       }
@@ -57,7 +59,7 @@ const AnalysisDetail = () => {
     if (id) {
       fetchAnalysis();
     }
-  }, [id]);
+  }, [id, t]);
 
   return (
     <div className="analysis-detail">
@@ -66,7 +68,7 @@ const AnalysisDetail = () => {
       {analysis && (
         <div className="results">
           <h1>{analysis.technology}</h1>
-          <p><em>Analysis from {new Date(analysis.created_at).toLocaleString()}</em></p>
+          <p><em>{t('analysisFrom')} {new Date(analysis.created_at).toLocaleString()}</em></p>
           <div className="result-section">
             <h2>{analysis.primary_ripples.title}</h2>
             <ul>

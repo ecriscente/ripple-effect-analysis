@@ -1,0 +1,10 @@
+Analise a tecnologia emergente conhecida como {technology}.
+
+Com base em informações publicamente disponíveis, identifique as consequências primárias e diretas da adoção desta tecnologia. Concentre-se nas quatro áreas a seguir:
+
+1.  **Capacidades Essenciais:** Quais são as novas capacidades fundamentais que esta tecnologia desbloqueia? O que é possível agora que não era antes?
+2.  **Automação e Eficiência:** Quais tarefas ou processos humanos existentes podem ser automatizados ou tornados significativamente mais eficientes por esta tecnologia?
+3.  **Novos Mercados e Plataformas:** Quais produtos, serviços ou plataformas inteiramente novos podem ser construídos diretamente sobre estas novas capacidades?
+4.  **Integração Imediata:** Como esta tecnologia está sendo integrada nas funções de negócios existentes hoje (por exemplo, marketing, finanças, operações, P&D)?
+
+Sintetize estas descobertas em uma visão geral concisa do cenário imediato de negócios e tecnologia criado por {technology}. Apresente as descobertas como uma lista de marcadores, com cada marcador começando com um título em negrito (por exemplo, **Capacidades Essenciais:**).

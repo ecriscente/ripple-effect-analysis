@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Login = ({ onLogin }: { onLogin: () => void }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const { t } = useTranslation();
 
     const handleLogin = async () => {
         try {
@@ -17,7 +19,7 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
 
             if (!response.ok) {
                 const data = await response.json();
-                throw new Error(data.detail || 'Failed to login');
+                throw new Error(data.detail || t('failedToLogin'));
             }
 
             const data = await response.json();
@@ -26,26 +28,26 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
             window.location.href = '/';
 
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'An unknown error occurred.');
+            setError(err instanceof Error ? err.message : t('unknownError'));
         }
     };
 
     return (
         <div className="auth-container">
-            <h2>Login</h2>
+            <h2>{t('login')}</h2>
             <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
+                placeholder={t('email')}
             />
             <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
+                placeholder={t('password')}
             />
-            <button onClick={handleLogin}>Login</button>
+            <button onClick={handleLogin}>{t('login')}</button>
             {error && <p className="error">{error}</p>}
         </div>
     );

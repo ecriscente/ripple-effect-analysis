@@ -8,13 +8,17 @@ import Dashboard from './Dashboard';
 import AnalysisDetail from './AnalysisDetail';
 import AnalysisForm from './AnalysisForm';
 import Navbar from './Navbar'; // Import the new Navbar component
+import { useTranslation } from 'react-i18next';
+import i18n from 'i18next'; // Import i18n to manage language state
 
 const Home = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="about">
       <header>
-        <h1>The Zeitgeist Engine</h1>
-        <p className="subtitle">A Framework for Predicting Humanity's Next Necessities</p>
+        <h1>{t('zeitgeistEngine')}</h1>
+        <p className="subtitle">{t('subtitle')}</p>
       </header>
 
       {isAuthenticated ? (
@@ -99,11 +103,20 @@ function App() {
     const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
     document.body.classList.toggle('dark-mode', savedTheme === 'dark');
+
+    // Load and set language from localStorage
+    const savedLanguage = localStorage.getItem('language') || 'en';
+    i18n.changeLanguage(savedLanguage);
   }, []);
 
   useEffect(() => {
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  // Save language to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('language', i18n.language);
+  }, [i18n.language]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');

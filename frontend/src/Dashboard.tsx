@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface AnalysisSummary {
   0: number; // id
@@ -11,6 +12,7 @@ const Dashboard = () => {
   const [analyses, setAnalyses] = useState<AnalysisSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchAnalyses = async () => {
@@ -19,7 +21,7 @@ const Dashboard = () => {
       const token = localStorage.getItem('token');
 
       if (!token) {
-        setError('You must be logged in to view your analyses.');
+        setError(t('mustBeLoggedInViewAnalyses'));
         setIsLoading(false);
         return;
       }
@@ -32,24 +34,24 @@ const Dashboard = () => {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch analyses.');
+          throw new Error(t('failedToFetchAnalyses'));
         }
 
         const data: AnalysisSummary[] = await response.json();
         setAnalyses(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred.');
+        setError(err instanceof Error ? err.message : t('unknownError'));
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchAnalyses();
-  }, []);
+  }, [t]);
 
   return (
     <div className="dashboard">
-      <h2>My Analyses</h2>
+      <h2>{t('myAnalyses')}</h2>
       {error && <p className="error">{error}</p>}
       {isLoading ? (
         <div className="loader"></div>

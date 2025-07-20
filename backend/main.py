@@ -26,6 +26,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 class AnalysisRequest(BaseModel):
     technology: str
+    language: Optional[str] = "en" # Added language parameter
 
 class UserCreate(BaseModel):
     email: str
@@ -74,7 +75,7 @@ async def analyze_technology(request: AnalysisRequest, token: str = Depends(oaut
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    analysis_result = get_analysis(request.technology)
+    analysis_result = get_analysis(request.technology, request.language) # Pass language parameter
     
     # Save the analysis to the database
     analysis_id = db.save_analysis(user[0], request.technology, analysis_result)

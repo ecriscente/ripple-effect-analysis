@@ -1,0 +1,9 @@
+Com base na análise das Ondas Primárias (consequências tecnológicas) e Ondas Secundárias (reações humanas) de {technology}, gere cinco conceitos inovadores de negócios ou produtos.
+
+Para cada conceito, declare explicitamente:
+
+1.  **O Conceito:** Uma descrição clara, de uma frase, do negócio ou produto.
+2.  **A Onda Primária Alavancada:** Qual capacidade tecnológica específica ou eficiência este conceito utiliza?
+3.  **A Onda Secundária Abordada:** Qual necessidade humana específica, medo ou desejo este conceito atende?
+
+Apresente os resultados como uma lista de marcadores, com cada marcador começando com um título em negrito (por exemplo, **Conceito 1:**).

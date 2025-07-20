@@ -15,11 +15,11 @@ genai.configure(api_key=GEMINI_API_KEY)
 # Initialize the Generative Model
 model = genai.GenerativeModel('gemini-1.5-flash')
 
-def _read_prompt_from_file(filename: str) -> str:
+def _read_prompt_from_file(filename: str, lang: str = 'en') -> str:
     """
-    Reads a prompt template from a specified file.
+    Reads a prompt template from a specified file for a given language.
     """
-    filepath = os.path.join(os.path.dirname(__file__), "prompts", filename)
+    filepath = os.path.join(os.path.dirname(__file__), "prompts", lang, filename)
     with open(filepath, 'r', encoding='utf-8') as f:
         return f.read()
 
@@ -32,21 +32,35 @@ def parse_llm_response(text: str) -> list[str]:
     # Remove common bullet point markers if present
     return [point.lstrip('-* ' ) for point in points]
 
-def get_analysis(technology: str):
+def get_analysis(technology: str, lang: str = 'en'):
     """
     This function calls a Large Language Model 
     using the Ripple Effect Analysis framework.
     """
 
-    # Load master prompts from files
-    prompt1_primary_ripples_template = _read_prompt_from_file('primary_ripples.txt')
-    prompt2_secondary_ripples_template = _read_prompt_from_file('secondary_ripples.txt')
-    prompt3_synthesis_template = _read_prompt_from_file('synthesis.txt')
+    # Load master prompts from files based on language
+    prompt1_primary_ripples_template = _read_prompt_from_file('primary_ripples.txt', lang)
+    prompt2_secondary_ripples_template = _read_prompt_from_file('secondary_ripples.txt', lang)
+    prompt3_synthesis_template = _read_prompt_from_file('synthesis.txt', lang)
 
     # Format prompts with the technology
     prompt1_primary_ripples = prompt1_primary_ripples_template.format(technology=technology)
     prompt2_secondary_ripples = prompt2_secondary_ripples_template.format(technology=technology)
     prompt3_synthesis = prompt3_synthesis_template.format(technology=technology)
+
+    # Define localized titles
+    titles = {
+        'en': {
+            'primary_ripples': f"Primary Ripples for {technology}",
+            'secondary_ripples': f"Secondary Ripples for {technology}",
+            'synthesis': f"Opportunities for {technology}"
+        },
+        'pt': {
+            'primary_ripples': f"Ondas Primárias para {technology}",
+            'secondary_ripples': f"Ondas Secundárias para {technology}",
+            'synthesis': f"Oportunidades para {technology}"
+        }
+    }
 
     # Call the LLM for each prompt
     try:
@@ -67,15 +81,15 @@ def get_analysis(technology: str):
 
     return {
         "primary_ripples": {
-            "title": f"Primary Ripples for {technology}",
+            "title": titles[lang]['primary_ripples'],
             "points": primary_ripples_points
         },
         "secondary_ripples": {
-            "title": f"Secondary Ripples for {technology}",
+            "title": titles[lang]['secondary_ripples'],
             "points": secondary_ripples_points
         },
         "synthesis": {
-            "title": f"Opportunities for {technology}",
+            "title": titles[lang]['synthesis'],
             "points": synthesis_points
         }
     }
@@ -83,12 +97,22 @@ def get_analysis(technology: str):
 if __name__ == "__main__":
     # Example usage:
     test_technology = "Artificial Intelligence"
-    print(f"\n--- Testing get_analysis for {test_technology} ---")
+    print(f"\n--- Testing get_analysis for {test_technology} (English) ---")
     try:
-        analysis_output = get_analysis(test_technology)
+        analysis_output_en = get_analysis(test_technology, lang='en')
         print("Analysis successful!")
-        print("Primary Ripples:", analysis_output["primary_ripples"]["points"][:2]) # Print first 2 points
-        print("Secondary Ripples:", analysis_output["secondary_ripples"]["points"][:2]) # Print first 2 points
-        print("Synthesis:", analysis_output["synthesis"]["points"][:2]) # Print first 2 points
+        print("Primary Ripples (EN):", analysis_output_en["primary_ripples"]["title"], analysis_output_en["primary_ripples"]["points"][:2])
+        print("Secondary Ripples (EN):", analysis_output_en["secondary_ripples"]["title"], analysis_output_en["secondary_ripples"]["points"][:2])
+        print("Synthesis (EN):", analysis_output_en["synthesis"]["title"], analysis_output_en["synthesis"]["points"][:2])
     except Exception as e:
-        print(f"Error during test: {e}")
+        print(f"Error during English test: {e}")
+
+    print(f"\n--- Testing get_analysis for {test_technology} (Portuguese) ---")
+    try:
+        analysis_output_pt = get_analysis(test_technology, lang='pt')
+        print("Analysis successful!")
+        print("Primary Ripples (PT):", analysis_output_pt["primary_ripples"]["title"], analysis_output_pt["primary_ripples"]["points"][:2])
+        print("Secondary Ripples (PT):", analysis_output_pt["secondary_ripples"]["title"], analysis_output_pt["secondary_ripples"]["points"][:2])
+        print("Synthesis (PT):", analysis_output_pt["synthesis"]["title"], analysis_output_pt["synthesis"]["points"][:2])
+    except Exception as e:
+        print(f"Error during Portuguese test: {e}")
