@@ -75,7 +75,7 @@ def get_analysis(technology: str):
             "points": secondary_ripples_points
         },
         "synthesis": {
-            "title": f"Synthesis for {technology}",
+            "title": f"Opportunities for {technology}",
             "points": synthesis_points
         }
     }

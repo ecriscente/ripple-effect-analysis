@@ -1,8 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
+interface AnalysisSummary {
+  0: number; // id
+  1: string; // technology
+  2: string; // created_at
+}
+
 const Dashboard = () => {
-  const [analyses, setAnalyses] = useState([]);
+  const [analyses, setAnalyses] = useState<AnalysisSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -29,7 +35,7 @@ const Dashboard = () => {
           throw new Error('Failed to fetch analyses.');
         }
 
-        const data = await response.json();
+        const data: AnalysisSummary[] = await response.json();
         setAnalyses(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred.');
@@ -49,7 +55,7 @@ const Dashboard = () => {
         <div className="loader"></div>
       ) : (
         <ul>
-          {analyses.map((analysis: any) => (
+          {analyses.map((analysis) => (
             <li key={analysis[0]}>
               <Link to={`/analysis/${analysis[0]}`}>
                 <h3>{analysis[1]}</h3>

@@ -11,7 +11,7 @@ import Navbar from './Navbar'; // Import the new Navbar component
 
 const Home = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   return (
-    <div className="container">
+    <div className="about">
       <header>
         <h1>The Zeitgeist Engine</h1>
         <p className="subtitle">A Framework for Predicting Humanity's Next Necessities</p>

@@ -1,9 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
+interface AnalysisSection {
+  title: string;
+  points: string[];
+}
+
+interface AnalysisData {
+  user_id: number;
+  technology: string;
+  primary_ripples: AnalysisSection;
+  secondary_ripples: AnalysisSection;
+  synthesis: AnalysisSection;
+  created_at: string;
+}
+
 const AnalysisDetail = () => {
   const { id } = useParams();
-  const [analysis, setAnalysis] = useState<any>(null);
+  const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -31,7 +45,7 @@ const AnalysisDetail = () => {
           throw new Error(errorData.detail || 'Failed to fetch analysis.');
         }
 
-        const data = await response.json();
+        const data: AnalysisData = await response.json();
         setAnalysis(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred.');
