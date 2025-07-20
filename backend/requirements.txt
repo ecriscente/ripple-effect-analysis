@@ -1,4 +1,7 @@
-fastapi
-uvicorn[standard]
-passlib[bcrypt]
-python-jose[cryptography]
+fastapi==0.115.14
+uvicorn[standard]==0.34.3
+passlib==1.7.4
+bcrypt==4.0.1
+python-jose[cryptography]==3.5.0
+python-dotenv==1.1.1
+google-generativeai==0.8.5

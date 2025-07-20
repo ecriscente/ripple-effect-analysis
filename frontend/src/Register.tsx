@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Register = () => {
+const Register = ({ onRegister }: { onRegister: () => void }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -20,6 +20,7 @@ const Register = () => {
                 throw new Error(data.detail || 'Failed to register');
             }
 
+            onRegister(); // Notify parent component
             // Handle successful registration, e.g., redirect to login
             window.location.href = '/login';
 

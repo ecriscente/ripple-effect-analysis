@@ -4,77 +4,11 @@ import './App.css';
 import { marked } from 'marked';
 import Login from './Login';
 import Register from './Register';
-
-// Define the structure of the analysis response
-interface AnalysisSection {
-  title: string;
-  points: string[];
-}
-
-interface AnalysisResponse {
-  primary_ripples: AnalysisSection;
-  secondary_ripples: AnalysisSection;
-  synthesis: AnalysisSection;
-}
+import Dashboard from './Dashboard';
+import AnalysisDetail from './AnalysisDetail';
+import AnalysisForm from './AnalysisForm';
 
 const Home = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
-  const [technology, setTechnology] = useState('');
-  const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [copiedSection, setCopiedSection] = useState<string | null>(null);
-
-  const handleCopy = async (text: string, section: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedSection(section);
-      setTimeout(() => setCopiedSection(null), 2000); // Reset after 2 seconds
-    } catch (err) {
-      console.error('Failed to copy:', err);
-      // Optionally, provide user feedback that copying failed
-    }
-  };
-
-  const handleAnalyze = async () => {
-    if (!technology) {
-      setError('Please enter a technology to analyze.');
-      return;
-    }
-
-    setIsLoading(true);
-    setError('');
-    setAnalysis(null);
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-        setError('You must be logged in to analyze.');
-        setIsLoading(false);
-        return;
-    }
-
-    try {
-      const response = await fetch('http://localhost:8000/api/analyze', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ technology }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch analysis. Please try again.');
-      }
-
-      const data: AnalysisResponse = await response.json();
-      setAnalysis(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="container">
       <header>
@@ -83,74 +17,7 @@ const Home = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
       </header>
 
       {isAuthenticated ? (
-        <>
-          <div className="input-section">
-            <input
-              type="text"
-              value={technology}
-              onChange={(e) => setTechnology(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleAnalyze();
-                }
-              }}
-              placeholder="Enter an emerging technology (e.g., 'Quantum Computing')"
-            />
-            <button onClick={handleAnalyze} disabled={isLoading}>
-              {isLoading ? 'Analyzing...' : 'Analyze'}
-            </button>
-          </div>
-
-          {error && <p className="error">{error}</p>}
-
-          {isLoading && <div className="loader"></div>}
-
-          {analysis && (
-            <div className="results">
-              <div className="result-section">
-                <div className="section-header">
-                  <h2>{analysis.primary_ripples.title}</h2>
-                  <button onClick={() => handleCopy(analysis.primary_ripples.points.join('\n'), 'primary')}>
-                    {copiedSection === 'primary' ? 'Copied!' : 'Copy'}
-                  </button>
-                </div>
-                <ul>
-                  {analysis.primary_ripples.points.map((point, index) => (
-                    <li key={index} dangerouslySetInnerHTML={{ __html: point.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}></li>
-                  ))} 
-                </ul>
-              </div>
-
-              <div className="result-section">
-                <div className="section-header">
-                  <h2>{analysis.secondary_ripples.title}</h2>
-                  <button onClick={() => handleCopy(analysis.secondary_ripples.points.join('\n'), 'secondary')}>
-                    {copiedSection === 'secondary' ? 'Copied!' : 'Copy'}
-                  </button>
-                </div>
-                <ul>
-                  {analysis.secondary_ripples.points.map((point, index) => (
-                    <li key={index} dangerouslySetInnerHTML={{ __html: point.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}></li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="result-section">
-                <div className="section-header">
-                  <h2>{analysis.synthesis.title}</h2>
-                  <button onClick={() => handleCopy(analysis.synthesis.points.join('\n'), 'synthesis')}>
-                    {copiedSection === 'synthesis' ? 'Copied!' : 'Copy'}
-                  </button>
-                </div>
-                <ul>
-                  {analysis.synthesis.points.map((point, index) => (
-                    <li key={index} dangerouslySetInnerHTML={{ __html: point.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}></li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
-        </>
+        <AnalysisForm />
       ) : (
         <div className="markdown-content" dangerouslySetInnerHTML={{ __html: marked(`
 # The Ripple Effect of AI: A Framework for Predicting Humanity's Next Necessities
@@ -235,7 +102,10 @@ function App() {
         <nav>
           <Link to="/">Home</Link>
           {isAuthenticated ? (
-            <button onClick={handleLogout}>Logout</button>
+            <>
+              <Link to="/dashboard">Dashboard</Link>
+              <button onClick={handleLogout}>Logout</button>
+            </>
           ) : (
             <>
               <Link to="/login">Login</Link>
@@ -245,8 +115,10 @@ function App() {
         </nav>
         <Routes>
           <Route path="/" element={<Home isAuthenticated={isAuthenticated} />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/analysis/:id" element={<AnalysisDetail />} />
+          <Route path="/login" element={<Login onLogin={checkAuthStatus} />} />
+          <Route path="/register" element={<Register onRegister={checkAuthStatus} />} />
         </Routes>
       </div>
     </Router>

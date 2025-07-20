@@ -2,9 +2,9 @@
 
 ## The Strategic Hub
 
-- [ ] **Database Schema:** Design and implement the database schema to store user analyses, including the technology name, the generated report, and a custom title.
-- [ ] **Backend Logic:** Connect the analysis generation in `main.py` to the user's account so that every report is automatically saved to the new database table.
-- [ ] **Frontend Dashboard:** Build the user dashboard page where users can see a list of their past analyses, click to view them, and give them custom, memorable titles.
+- [x] **Database Schema:** Design and implement the database schema to store user analyses, including the technology name, the generated report, and a custom title.
+- [x] **Backend Logic:** Connect the analysis generation in `main.py` to the user's account so that every report is automatically saved to the new database table.
+- [x] **Frontend Dashboard:** Build the user dashboard page where users can see a list of their past analyses, click to view them, and give them custom, memorable titles.
 
 ## The Collaborative Catalyst
 

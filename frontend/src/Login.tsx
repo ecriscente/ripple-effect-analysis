@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Login = () => {
+const Login = ({ onLogin }: { onLogin: () => void }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -22,6 +22,7 @@ const Login = () => {
 
             const data = await response.json();
             localStorage.setItem('token', data.access_token);
+            onLogin(); // Notify parent component
             window.location.href = '/';
 
         } catch (err) {
