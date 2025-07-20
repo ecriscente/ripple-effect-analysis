@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import { marked } from 'marked';
 import Login from './Login';
@@ -7,6 +7,7 @@ import Register from './Register';
 import Dashboard from './Dashboard';
 import AnalysisDetail from './AnalysisDetail';
 import AnalysisForm from './AnalysisForm';
+import Navbar from './Navbar'; // Import the new Navbar component
 
 const Home = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   return (
@@ -52,7 +53,7 @@ These are the waves of change created by our collective human reaction *to* the 
 *   **The Need for Economic Security & Continuous Reskilling:** The efficiency of AI-driven automation creates a legitimate anxiety about job displacement. This gives rise to a massive, continuous need for accessible and effective platforms for reskilling and upskilling, with a particular focus on cultivating abilities that AI cannot replicate.
 *   **The Craving for Authentic Social Connection:** As interactions with AI become more common, there is a growing concern about "empathy atrophy"—a potential decline in our ability to engage with the complexities of human emotions. This fuels a powerful demand for services, platforms, and experiences that foster genuine, real-world human connection and build strong communities.
 *   **The Premium on "Human" Skills:** In a world where AI can generate content and analyze data, the skills that become most valuable are those that are intrinsically human. Critical thinking, deep creativity, emotional intelligence, and complex problem-solving are no longer soft skills, but essential "power skills." This creates a market for new forms of education and professional development focused on honing these abilities.
-*   **The Search for Purpose and Meaning:** When AI can handle the "how," humans are freed—and compelled—to focus on the "why." This leads to a profound search for purpose, both in our work and in our personal lives. Businesses that are mission-driven, that help individuals align their work with their values, and that offer products that provide genuine fulfillment will have a significant advantage.
+*   **The Search for Purpose and Meaning:** When AI can handle the "how," humans are freed—and compelled—to focus on the "why." This leads to a profound search for purpose, both in our work and in our personal lives. Businesses that are mission-driven, that help individuals align their work with their values, and that offer products that provide genuine fulfillment will be a significant advantage.
 *   **The Demand for Privacy and Trust:** The data-intensive nature of AI systems naturally creates a need for robust privacy-enhancing technologies and services. As users become more aware of their digital footprint, they will demand tools that give them control over their data and build trust in the systems they interact with.
 
 ## Conclusion: Finding Opportunity at the Intersection
@@ -113,23 +114,12 @@ function App() {
   return (
     <Router>
       <div className="container">
-        <nav>
-          <Link to="/">Home</Link>
-          {isAuthenticated ? (
-            <>
-              <Link to="/dashboard">Dashboard</Link>
-              <button onClick={handleLogout}>Logout</button>
-            </>
-          ) : (
-            <>
-              <Link to="/login">Login</Link>
-              <Link to="/register">Register</Link>
-            </>
-          )}
-          <button onClick={toggleTheme} className="theme-toggle-button">
-            {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-          </button>
-        </nav>
+        <Navbar
+          isAuthenticated={isAuthenticated}
+          handleLogout={handleLogout}
+          theme={theme}
+          toggleTheme={toggleTheme}
+        />
         <Routes>
           <Route path="/" element={<Home isAuthenticated={isAuthenticated} />} />
           <Route path="/dashboard" element={<Dashboard />} />

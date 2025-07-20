@@ -96,6 +96,7 @@ input[type="text"] {
   border-radius: 8px;
   outline: none;
   transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s, color 0.3s;
+  box-sizing: border-box; /* Added for consistent width */
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
   background-color: var(--container-bg-light);
   color: var(--text-color-light);
@@ -279,20 +280,36 @@ body.dark-mode .section-header button:hover {
 }
 
 /* Navigation Styles */
-nav {
+.navbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   padding: 1rem 0;
   margin-bottom: 2rem;
   border-bottom: 1px solid var(--section-border-light);
 }
 
-body.dark-mode nav {
+body.dark-mode .navbar {
     border-bottom-color: var(--section-border-dark);
 }
 
-nav a {
+.navbar-brand a {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary-color-light);
+  text-decoration: none;
+}
+
+body.dark-mode .navbar-brand a {
+    color: var(--primary-color-dark);
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-links a {
   margin-left: 1.5rem;
   text-decoration: none;
   color: var(--primary-color-light);
@@ -301,15 +318,15 @@ nav a {
   transition: color 0.3s ease;
 }
 
-nav a:hover {
+.navbar-links a:hover {
   color: var(--strong-text-color-light);
 }
 
-body.dark-mode nav a {
+body.dark-mode .navbar-links a {
     color: var(--primary-color-dark);
 }
 
-body.dark-mode nav a:hover {
+body.dark-mode .navbar-links a:hover {
     color: #ffffff;
 }
 
@@ -346,6 +363,7 @@ body.dark-mode .auth-container h2 {
   border-radius: 8px;
   background-color: var(--container-bg-light);
   color: var(--text-color-light);
+  box-sizing: border-box; /* Added for consistent width */
 }
 
 body.dark-mode .auth-container input {
@@ -460,4 +478,119 @@ body.dark-mode .theme-toggle-button:hover {
     background-color: var(--primary-color-dark);
     border-color: var(--primary-color-dark);
     color: var(--background-color-dark);
+}
+
+/* Hamburger Menu */
+.hamburger-menu {
+  display: none; /* Hidden by default on desktop */
+  flex-direction: column;
+  justify-content: space-around;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+}
+
+.hamburger-icon {
+  width: 2rem;
+  height: 0.25rem;
+  background: var(--text-color-light);
+  border-radius: 10px;
+  transition: all 0.3s linear;
+  position: relative;
+  transform-origin: 1px;
+}
+
+body.dark-mode .hamburger-icon {
+    background: var(--text-color-dark);
+}
+
+.hamburger-menu:focus {
+  outline: none;
+}
+
+/* Media Queries for Mobile Responsiveness */
+@media (max-width: 768px) {
+  body {
+    padding: 1rem;
+  }
+
+  .container {
+    padding: 1.5rem;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  .subtitle {
+    font-size: 1.1rem;
+  }
+
+  .input-section {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  input[type="text"],
+  button {
+    width: 100%;
+  }
+
+  .results {
+    grid-template-columns: 1fr;
+  }
+
+  .result-section {
+    padding: 1.5rem;
+  }
+
+  .result-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .auth-container {
+    margin: 1rem auto;
+    padding: 1.5rem;
+  }
+
+  .navbar {
+    flex-direction: row; /* Keep brand and hamburger on one line */
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .navbar-links {
+    display: none; /* Hide links by default on mobile */
+    flex-direction: column;
+    width: 100%;
+    position: absolute;
+    top: 60px; /* Adjust based on navbar height */
+    left: 0;
+    background-color: var(--container-bg-light); /* Reverted to container background */
+    border-bottom: 1px solid var(--section-border-light);
+    padding: 1rem 0;
+  }
+
+  body.dark-mode .navbar-links {
+      background-color: var(--container-bg-dark); /* Reverted to container background */
+      border-bottom-color: var(--section-border-dark);
+  }
+
+  .navbar-links.open {
+    display: flex; /* Show links when open */
+  }
+
+  .navbar-links a,
+  .navbar-links button {
+    margin: 0.5rem 1rem; /* Adjust spacing for mobile links */
+    width: auto; /* Reset width for links */
+  }
+
+  .hamburger-menu {
+    display: flex; /* Show hamburger on mobile */
+  }
 }
