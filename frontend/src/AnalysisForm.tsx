@@ -50,7 +50,9 @@ const AnalysisForm = () => {
       });
 
       if (!response.ok) {
-        throw new Error(t('failedToFetchAnalysis'));
+        const errorData = await response.json();
+        // Use the errorData.detail as a translation key
+        throw new Error(t(errorData.detail) || t('failedToFetchAnalysis'));
       }
 
       const data: AnalysisResponse = await response.json();
@@ -75,6 +77,7 @@ const AnalysisForm = () => {
                 }
             }}
             placeholder={t('enterTechnology')}
+            maxLength={100} // Added character limit
             />
             <button onClick={handleAnalyze} disabled={isLoading}>
             {isLoading ? t('analyzing') : t('analyze')}

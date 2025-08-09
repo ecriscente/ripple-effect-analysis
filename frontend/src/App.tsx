@@ -11,6 +11,9 @@ import Navbar from './Navbar'; // Import the new Navbar component
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next'; // Import i18n to manage language state
 
+import ForgotPassword from './ForgotPassword';
+import ResetPassword from './ResetPassword';
+
 const Home = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const { t } = useTranslation();
 
@@ -86,6 +89,8 @@ function App() {
           <Route path="/analysis/:id" element={<AnalysisDetail />} />
           <Route path="/login" element={<Login onLogin={checkAuthStatus} />} />
           <Route path="/register" element={<Register onRegister={checkAuthStatus} />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
         </Routes>
       </div>
     </Router>

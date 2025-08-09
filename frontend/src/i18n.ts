@@ -41,6 +41,12 @@ i18n
           "failedToRegister": "Failed to register",
           "notAuthorized": "Not authorized to view this analysis",
           "analysisNotFound": "Analysis not found",
+          "invalidTechnology": "Invalid technology entered",
+          "forgotPassword": "Forgot your password?",
+          "dontHaveAccount": "Don't have an account?",
+          "sendResetLink": "Send Reset Link",
+          "resetPassword": "Reset Password",
+          "newPassword": "New Password",
           "aboutContent": `
 # The Ripple Effect of AI: A Framework for Predicting Humanity's Next Necessities
 
@@ -133,6 +139,12 @@ The question for every innovator is no longer just "What can this technology do?
           "failedToRegister": "Falha ao registrar",
           "notAuthorized": "Não autorizado a ver esta análise",
           "analysisNotFound": "Análise não encontrada",
+          "invalidTechnology": "Tecnologia inválida inserida",
+          "forgotPassword": "Esqueceu sua senha?",
+          "dontHaveAccount": "Não tem uma conta?",
+          "sendResetLink": "Enviar Link de Redefinição",
+          "resetPassword": "Redefinir Senha",
+          "newPassword": "Nova Senha",
           "aboutContent": `
 # O Efeito Cascata da IA: Uma Estrutura para Prever as Próximas Necessidades da Humanidade
 

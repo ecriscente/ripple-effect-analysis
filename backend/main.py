@@ -7,9 +7,13 @@ from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from typing import Optional
 
-from llm_integration import get_analysis
+import secrets
+from datetime import datetime, timedelta
+
+from llm_integration import get_analysis, validate_technology # Import validate_technology
 import database as db
 import auth
+import email_service
 
 from fastapi.responses import HTMLResponse
 
@@ -45,10 +49,50 @@ class UserLogin(BaseModel):
     email: str
     password: str
 
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
 @app.on_event("startup")
 def startup_db_client():
     db.create_user_table()
     db.create_analysis_table()
+    db.create_password_reset_table()
+
+@app.post("/api/forgot-password")
+async def forgot_password(request: ForgotPasswordRequest):
+    user = db.get_user(request.email)
+    print(f"User found: {user}")  # For debugging purposes
+    if not user:
+        # Still return a success message to prevent email enumeration
+        return {"message": "If an account with that email exists, a password reset link has been sent."}
+
+    token = secrets.token_urlsafe(32)
+    expires_at = datetime.utcnow() + timedelta(hours=1)
+    db.create_password_reset_token(user[0], token, expires_at)
+
+    # This is a placeholder. You need to configure your frontend URL
+    reset_link = f"http://localhost:5173/reset-password/{token}"
+    print(f"Password reset link: {reset_link}")  # For debugging purposes
+    email_service.send_password_reset_email(request.email, reset_link)
+    print(f"Password reset email sent to {request.email}")
+
+    return {"message": "If an account with that email exists, a password reset link has been sent."}
+
+@app.post("/api/reset-password")
+async def reset_password(request: ResetPasswordRequest):
+    user = db.get_user_by_reset_token(request.token)
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid or expired token")
+
+    db.update_user_password(user[0], request.new_password)
+    db.delete_password_reset_token(request.token)
+
+    return {"message": "Password has been reset successfully."}
+
 
 @app.post("/api/register")
 async def register_user(user: UserCreate):
@@ -84,6 +128,10 @@ async def analyze_technology(request: AnalysisRequest, token: str = Depends(oaut
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
+    # Validate technology using LLM
+    if not validate_technology(request.technology, request.language):
+        raise HTTPException(status_code=400, detail="invalidTechnology") # Return a key for frontend translation
+
     analysis_result = get_analysis(request.technology, request.language) # Pass language parameter
     
     # Save the analysis to the database

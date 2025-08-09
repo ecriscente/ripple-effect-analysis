@@ -1,0 +1,1 @@
+Is "{technology}" a valid emerging technology or a concept related to technology? Answer with only "yes" or "no".

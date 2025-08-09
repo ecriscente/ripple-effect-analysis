@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 const Login = ({ onLogin }: { onLogin: () => void }) => {
     const [email, setEmail] = useState('');
@@ -49,6 +50,12 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
             />
             <button onClick={handleLogin}>{t('login')}</button>
             {error && <p className="error">{error}</p>}
+            <p>
+                <Link to="/forgot-password">{t('forgotPassword')}</Link>
+            </p>
+            <p>
+                {t('dontHaveAccount')} <Link to="/register">{t('register')}</Link>
+            </p>
         </div>
     );
 };

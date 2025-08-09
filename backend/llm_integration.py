@@ -13,7 +13,7 @@ if not GEMINI_API_KEY:
 genai.configure(api_key=GEMINI_API_KEY)
 
 # Initialize the Generative Model
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 def _read_prompt_from_file(filename: str, lang: str = 'en') -> str:
     """
@@ -31,6 +31,22 @@ def parse_llm_response(text: str) -> list[str]:
     points = [line.strip() for line in text.split('\n') if line.strip()]
     # Remove common bullet point markers if present
     return [point.lstrip('-* ' ) for point in points]
+
+def validate_technology(technology: str, lang: str = 'en') -> bool:
+    """
+    Validates if the given technology is a valid emerging technology using LLM.
+    """
+    validation_prompt_template = _read_prompt_from_file('validate_technology.txt', lang)
+    validation_prompt = validation_prompt_template.format(technology=technology)
+    print(f"Validation Prompt: {validation_prompt}")  # Debugging line
+    try:
+        response = model.generate_content(validation_prompt)
+        answer = response.text.strip().lower()
+        print(f"LLM Response: {answer}")  # Debugging line
+        return answer in ['yes', 'sim']
+    except Exception as e:
+        print(f"Error during technology validation: {e}")
+        return False # Assume invalid on error
 
 def get_analysis(technology: str, lang: str = 'en'):
     """
@@ -116,3 +132,12 @@ if __name__ == "__main__":
         print("Synthesis (PT):", analysis_output_pt["synthesis"]["title"], analysis_output_pt["synthesis"]["points"][:2])
     except Exception as e:
         print(f"Error during Portuguese test: {e}")
+
+    print(f"\n--- Testing validate_technology for {test_technology} (English) ---")
+    is_valid = validate_technology(test_technology, lang='en')
+    print(f"Is '{test_technology}' a valid technology? {is_valid}")
+
+    test_invalid_technology = "asdfasdfasdf"
+    print(f"\n--- Testing validate_technology for {test_invalid_technology} (English) ---")
+    is_valid = validate_technology(test_invalid_technology, lang='en')
+    print(f"Is '{test_invalid_technology}' a valid technology? {is_valid}")
