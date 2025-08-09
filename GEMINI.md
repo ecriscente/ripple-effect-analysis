@@ -1,10 +1,10 @@
-# Gemini Context: The Zeitgeist Engine
+# Gemini Context: Ripple Effect Analysis
 
-This file provides context for the Gemini assistant regarding "The Zeitgeist Engine" project.
+This file provides context for the Gemini assistant regarding "Ripple Effect Analysis" project.
 
 ## Project Overview
 
-"The Zeitgeist Engine" is a web application designed to automate the "Ripple Effect Analysis" framework. It allows users to input an emerging technology and receive a structured analysis of its direct consequences, human-societal reactions, and potential business opportunities.
+"Ripple Effect Analysis" is a web application designed to automate the "Ripple Effect Analysis" framework. It allows users to input an emerging technology and receive a structured analysis of its direct consequences, human-societal reactions, and potential business opportunities.
 
 ## Current Status
 

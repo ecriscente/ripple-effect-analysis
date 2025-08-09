@@ -1,4 +1,4 @@
-# The Zeitgeist Engine - TODO
+# Ripple Effect Analysis - TODO
 
 ## Phase 2: Collaborative Features
 

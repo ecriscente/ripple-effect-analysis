@@ -184,10 +184,10 @@ async def root():
     <!DOCTYPE html>
     <html>
       <head>
-        <title>Zeitgeist Engine API</title>
+        <title>Ripple Effect Analysis API</title>
       </head>
       <body>
-        <h1>Zeitgeist Engine API</h1>
+        <h1>Ripple Effect Analysis API</h1>
         <p>If you see this page, your backend is running and ngrok can be approved.</p>
       </body>
     </html>

@@ -6,7 +6,7 @@ def send_password_reset_email(to_email: str, reset_link: str):
     message = Mail(
         from_email=os.environ.get('SENDGRID_FROM_EMAIL', 'no-reply@zeitgeist.engine'),
         to_emails=to_email,
-        subject='Reset Your Password for The Zeitgeist Engine',
+        subject='Reset Your Password for Ripple Effect Analysis',
         html_content=f'Please click the following link to reset your password: <a href="{reset_link}">{reset_link}</a>'
     )
     try:

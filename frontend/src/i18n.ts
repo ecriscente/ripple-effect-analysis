@@ -7,7 +7,7 @@ i18n
     resources: {
       en: {
         translation: {
-          "zeitgeistEngine": "The Zeitgeist Engine",
+          "zeitgeistEngine": "Ripple Effect Analysis",
           "subtitle": "A Framework for Predicting Humanity's Next Necessities",
           "home": "Home",
           "dashboard": "Dashboard",
@@ -105,7 +105,7 @@ The question for every innovator is no longer just "What can this technology do?
       },
       pt: {
         translation: {
-          "zeitgeistEngine": "O Motor Zeitgeist",
+          "zeitgeistEngine": "Ripple Effect Analysis",
           "subtitle": "Uma Estrutura para Prever as Próximas Necessidades da Humanidade",
           "home": "Início",
           "dashboard": "Painel",

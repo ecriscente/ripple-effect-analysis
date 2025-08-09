@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-The Zeitgeist Engine is a web application that automates the "Ripple Effect Analysis" framework for emerging technology assessment. It consists of a React/TypeScript frontend and a FastAPI Python backend that integrates with Google's Gemini API to analyze technologies through a structured prompt engineering approach.
+Ripple Effect Analysis is a web application that automates the "Ripple Effect Analysis" framework for emerging technology assessment. It consists of a React/TypeScript frontend and a FastAPI Python backend that integrates with Google's Gemini API to analyze technologies through a structured prompt engineering approach.
 
 ## Development Commands
 

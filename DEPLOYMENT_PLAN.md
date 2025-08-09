@@ -1,6 +1,6 @@
-# Deployment Plan: The Zeitgeist Engine
+# Deployment Plan: Ripple Effect Analysis
 
-This document outlines a strategy for deploying "The Zeitgeist Engine" web application, leveraging free-tier cloud services where possible. The project consists of a React/TypeScript frontend and a FastAPI backend with a SQLite database.
+This document outlines a strategy for deploying "Ripple Effect Analysis" web application, leveraging free-tier cloud services where possible. The project consists of a React/TypeScript frontend and a FastAPI backend with a SQLite database.
 
 ## 1. Project Components Overview
 
