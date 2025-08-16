@@ -11,6 +11,7 @@ import Navbar from './Navbar'; // Import the new Navbar component
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next'; // Import i18n to manage language state
 import { trackPageView, trackThemeToggle, trackLanguageChange } from './analytics';
+import { initSentry, SentryErrorBoundary, setUserContext, clearUserContext, addBreadcrumb } from './sentry';
 
 import ForgotPassword from './ForgotPassword';
 import ResetPassword from './ResetPassword';
@@ -51,7 +52,18 @@ function App() {
 
   const checkAuthStatus = () => {
     const token = localStorage.getItem('token');
-    setIsAuthenticated(!!token);
+    const isAuth = !!token;
+    setIsAuthenticated(isAuth);
+    
+    // Update Sentry user context
+    if (isAuth) {
+      // You could decode the JWT to get user info, for now just set authenticated state
+      setUserContext({ id: 'authenticated-user' });
+      addBreadcrumb('User authenticated', 'auth');
+    } else {
+      clearUserContext();
+      addBreadcrumb('User logged out', 'auth');
+    }
   };
 
   const toggleTheme = () => {
@@ -62,6 +74,9 @@ function App() {
   };
 
   useEffect(() => {
+    // Initialize Sentry for error monitoring
+    initSentry();
+    
     checkAuthStatus();
     const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
@@ -89,26 +104,35 @@ function App() {
   };
 
   return (
-    <Router>
-      <AnalyticsTracker />
-      <div className="container">
-        <Navbar
-          isAuthenticated={isAuthenticated}
-          handleLogout={handleLogout}
-          theme={theme}
-          toggleTheme={toggleTheme}
-        />
-        <Routes>
-          <Route path="/" element={<Home isAuthenticated={isAuthenticated} />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/analysis/:id" element={<AnalysisDetail />} />
-          <Route path="/login" element={<Login onLogin={checkAuthStatus} />} />
-          <Route path="/register" element={<Register onRegister={checkAuthStatus} />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
-        </Routes>
+    <SentryErrorBoundary fallback={({ error, resetError }) => (
+      <div className="error-boundary">
+        <h2>Something went wrong</h2>
+        <p>We've been notified of this error and will fix it soon.</p>
+        <button onClick={resetError}>Try again</button>
+        {import.meta.env.DEV && <pre>{error.toString()}</pre>}
       </div>
-    </Router>
+    )}>
+      <Router>
+        <AnalyticsTracker />
+        <div className="container">
+          <Navbar
+            isAuthenticated={isAuthenticated}
+            handleLogout={handleLogout}
+            theme={theme}
+            toggleTheme={toggleTheme}
+          />
+          <Routes>
+            <Route path="/" element={<Home isAuthenticated={isAuthenticated} />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/analysis/:id" element={<AnalysisDetail />} />
+            <Route path="/login" element={<Login onLogin={checkAuthStatus} />} />
+            <Route path="/register" element={<Register onRegister={checkAuthStatus} />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
+          </Routes>
+        </div>
+      </Router>
+    </SentryErrorBoundary>
   );
 }
 

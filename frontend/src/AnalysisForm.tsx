@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next'; // Import i18n to get the current language
 import { trackAnalysisSubmission } from './analytics';
+import { captureError, addBreadcrumb } from './sentry';
 
 // Define the structure of the analysis response
 interface AnalysisSection {
@@ -41,6 +42,8 @@ const AnalysisForm = () => {
     }
 
     try {
+      addBreadcrumb('Analysis submission started', 'user_action', { technology, language: i18n.language });
+      
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/analyze`, {
         method: 'POST',
         headers: {
@@ -52,15 +55,31 @@ const AnalysisForm = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        // Use the errorData.detail as a translation key
-        throw new Error(t(errorData.detail) || t('failedToFetchAnalysis'));
+        const errorMessage = t(errorData.detail) || t('failedToFetchAnalysis');
+        
+        // Report API errors to Sentry
+        captureError(new Error(`Analysis API Error: ${errorMessage}`), {
+          technology,
+          language: i18n.language,
+          statusCode: response.status,
+          errorData
+        });
+        
+        throw new Error(errorMessage);
       }
 
       const data: AnalysisResponse = await response.json();
       trackAnalysisSubmission(technology, i18n.language);
+      addBreadcrumb('Analysis submission successful', 'user_action', { analysisId: data.id });
       navigate(`/analysis/${data.id}`); // Redirect to the new analysis detail page
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('unknownError'));
+      const errorMessage = err instanceof Error ? err.message : t('unknownError');
+      setError(errorMessage);
+      
+      // Report unexpected errors to Sentry
+      if (err instanceof Error) {
+        captureError(err, { technology, language: i18n.language, context: 'analysis_submission' });
+      }
     } finally {
       setIsLoading(false);
     }
