@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { trackAnalysisView } from './analytics';
 
 interface AnalysisSection {
   title: string;
@@ -61,6 +62,7 @@ const AnalysisDetail = () => {
 
         const data: AnalysisData = await response.json();
         setAnalysis(data);
+        trackAnalysisView(id || '', data.technology);
       } catch (err) {
         setError(err instanceof Error ? err.message : t('unknownError'));
       } finally {

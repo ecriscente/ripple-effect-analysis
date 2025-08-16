@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next'; // Import i18n to get the current language
+import { trackAnalysisSubmission } from './analytics';
 
 // Define the structure of the analysis response
 interface AnalysisSection {
@@ -56,6 +57,7 @@ const AnalysisForm = () => {
       }
 
       const data: AnalysisResponse = await response.json();
+      trackAnalysisSubmission(technology, i18n.language);
       navigate(`/analysis/${data.id}`); // Redirect to the new analysis detail page
     } catch (err) {
       setError(err instanceof Error ? err.message : t('unknownError'));

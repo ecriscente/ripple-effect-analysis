@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
 import { marked } from 'marked';
 import Login from './Login';
@@ -10,9 +10,21 @@ import AnalysisForm from './AnalysisForm';
 import Navbar from './Navbar'; // Import the new Navbar component
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next'; // Import i18n to manage language state
+import { trackPageView, trackThemeToggle, trackLanguageChange } from './analytics';
 
 import ForgotPassword from './ForgotPassword';
 import ResetPassword from './ResetPassword';
+
+// Component to track page views
+const AnalyticsTracker = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    trackPageView(location.pathname);
+  }, [location]);
+
+  return null;
+};
 
 const Home = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const { t } = useTranslation();
@@ -46,6 +58,7 @@ function App() {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
     document.body.classList.toggle('dark-mode', newTheme === 'dark');
+    trackThemeToggle(newTheme);
   };
 
   useEffect(() => {
@@ -66,6 +79,7 @@ function App() {
   // Save language to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('language', i18n.language);
+    trackLanguageChange(i18n.language);
   }, [i18n.language]);
 
   const handleLogout = () => {
@@ -76,6 +90,7 @@ function App() {
 
   return (
     <Router>
+      <AnalyticsTracker />
       <div className="container">
         <Navbar
           isAuthenticated={isAuthenticated}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { trackUserLogin } from './analytics';
 
 const Login = ({ onLogin }: { onLogin: () => void }) => {
     const [email, setEmail] = useState('');
@@ -25,6 +26,7 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
 
             const data = await response.json();
             localStorage.setItem('token', data.access_token);
+            trackUserLogin('email');
             onLogin(); // Notify parent component
             window.location.href = '/';
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { trackUserRegistration } from './analytics';
 
 const Register = ({ onRegister }: { onRegister: () => void }) => {
     const [email, setEmail] = useState('');
@@ -22,6 +23,7 @@ const Register = ({ onRegister }: { onRegister: () => void }) => {
                 throw new Error(data.detail || t('failedToRegister'));
             }
 
+            trackUserRegistration('email');
             onRegister(); // Notify parent component
             // Handle successful registration, e.g., redirect to login
             window.location.href = '/login';
