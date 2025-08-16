@@ -1,6 +1,10 @@
 import pytest
+import os
 from unittest.mock import patch, MagicMock
-from backend.llm_integration import get_analysis, model # Import model
+
+# Mock the environment variable before importing the module
+with patch.dict(os.environ, {'GEMINI_API_KEY': 'test-api-key'}):
+    from backend.llm_integration import get_analysis, model # Import model
 
 @pytest.fixture
 def mock_gemini_response():
