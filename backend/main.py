@@ -39,11 +39,11 @@ if sentry_dsn:
 
 app = FastAPI()
 
-frontend_ngrok_url = "https://57e6116b1724.ngrok-free.app" # <-- IMPORTANT: Change this
+frontend_production_url = "https://ripple-effect.erion.dev"
 
 origins = [
-    "http://localhost:5173",  # Your local dev environment
-    frontend_ngrok_url       # Your public frontend
+    "http://localhost:5173",      # Your local dev environment
+    frontend_production_url       # Your production frontend
 ]
 
 # Configure CORS
@@ -95,8 +95,8 @@ async def forgot_password(request: ForgotPasswordRequest):
     expires_at = datetime.utcnow() + timedelta(hours=1)
     db.create_password_reset_token(user[0], token, expires_at)
 
-    # This is a placeholder. You need to configure your frontend URL
-    reset_link = f"http://localhost:5173/reset-password/{token}"
+    # Use production frontend URL for password reset links
+    reset_link = f"{frontend_production_url}/reset-password/{token}"
     print(f"Password reset link: {reset_link}")  # For debugging purposes
     email_service.send_password_reset_email(request.email, reset_link)
     print(f"Password reset email sent to {request.email}")
