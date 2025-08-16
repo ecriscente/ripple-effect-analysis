@@ -1,6 +1,11 @@
 from dotenv import load_dotenv
 load_dotenv()
 
+import os
+import sentry_sdk
+from sentry_sdk.integrations.fastapi import FastApiIntegration
+from sentry_sdk.integrations.starlette import StarletteIntegration
+
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
@@ -16,6 +21,21 @@ import auth
 import email_service
 
 from fastapi.responses import HTMLResponse
+
+# Initialize Sentry
+sentry_dsn = os.getenv("SENTRY_DSN")
+environment = os.getenv("ENVIRONMENT", "development")
+
+if sentry_dsn:
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        # Add data like request headers and IP for users
+        send_default_pii=True,
+        environment=environment,
+        traces_sample_rate=0.1 if environment == "production" else 1.0,
+        release=f"ripple-effect-analysis-backend@{os.getenv('APP_VERSION', 'dev')}",
+    )
+    print("Sentry initialized successfully")
 
 app = FastAPI()
 
@@ -128,18 +148,42 @@ async def analyze_technology(request: AnalysisRequest, token: str = Depends(oaut
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    # Validate technology using LLM
-    if not validate_technology(request.technology, request.language):
-        raise HTTPException(status_code=400, detail="invalidTechnology") # Return a key for frontend translation
+    try:
+        # Add user context to Sentry
+        sentry_sdk.set_user({"id": str(user[0]), "email": email})
+        sentry_sdk.set_tag("technology", request.technology)
+        sentry_sdk.set_tag("language", request.language)
+        
+        # Validate technology using LLM
+        if not validate_technology(request.technology, request.language):
+            sentry_sdk.add_breadcrumb(
+                message="Technology validation failed",
+                category="validation",
+                data={"technology": request.technology, "language": request.language}
+            )
+            raise HTTPException(status_code=400, detail="invalidTechnology") # Return a key for frontend translation
 
-    analysis_result = get_analysis(request.technology, request.language) # Pass language parameter
-    
-    # Save the analysis to the database
-    analysis_id = db.save_analysis(user[0], request.technology, analysis_result)
-    if not analysis_id:
-        raise HTTPException(status_code=500, detail="Failed to save analysis.")
+        analysis_result = get_analysis(request.technology, request.language) # Pass language parameter
+        
+        # Save the analysis to the database
+        analysis_id = db.save_analysis(user[0], request.technology, analysis_result)
+        if not analysis_id:
+            sentry_sdk.capture_message("Failed to save analysis to database", level="error")
+            raise HTTPException(status_code=500, detail="Failed to save analysis.")
 
-    return {**analysis_result, "id": analysis_id}
+        sentry_sdk.add_breadcrumb(
+            message="Analysis completed successfully",
+            category="analysis",
+            data={"analysis_id": analysis_id, "technology": request.technology}
+        )
+        
+        return {**analysis_result, "id": analysis_id}
+        
+    except HTTPException:
+        raise  # Re-raise HTTP exceptions as-is
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
+        raise HTTPException(status_code=500, detail="An unexpected error occurred during analysis.")
 
 @app.get("/api/analyses")
 async def get_user_analyses(token: str = Depends(oauth2_scheme)):
