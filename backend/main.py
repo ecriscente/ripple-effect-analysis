@@ -64,6 +64,7 @@ class AnalysisRequest(BaseModel):
 class UserCreate(BaseModel):
     email: str
     password: str
+    agreedToTerms: bool
 
 class UserLogin(BaseModel):
     email: str
@@ -116,10 +117,13 @@ async def reset_password(request: ResetPasswordRequest):
 
 @app.post("/api/register")
 async def register_user(user: UserCreate):
+    if not user.agreedToTerms:
+        raise HTTPException(status_code=400, detail="You must agree to the Terms of Service and Privacy Policy to register")
+    
     db_user = db.get_user(user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    new_user = db.create_user(email=user.email, password=user.password)
+    new_user = db.create_user(email=user.email, password=user.password, terms_agreed=user.agreedToTerms)
     if not new_user:
         raise HTTPException(status_code=400, detail="Could not create user")
     return {"email": new_user[1]}

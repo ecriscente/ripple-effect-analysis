@@ -47,6 +47,11 @@ i18n
           "sendResetLink": "Send Reset Link",
           "resetPassword": "Reset Password",
           "newPassword": "New Password",
+          "agreeToTerms": "I agree to the",
+          "termsOfService": "Terms of Service",
+          "privacyPolicy": "Privacy Policy",
+          "and": "and",
+          "mustAgreeToTerms": "You must agree to the Terms of Service and Privacy Policy to register.",
           "aboutContent": `
 # The Ripple Effect of AI: A Framework for Predicting Humanity's Next Necessities
 
@@ -145,6 +150,11 @@ The question for every innovator is no longer just "What can this technology do?
           "sendResetLink": "Enviar Link de Redefinição",
           "resetPassword": "Redefinir Senha",
           "newPassword": "Nova Senha",
+          "agreeToTerms": "Eu concordo com os",
+          "termsOfService": "Termos de Serviço",
+          "privacyPolicy": "Política de Privacidade",
+          "and": "e",
+          "mustAgreeToTerms": "Você deve concordar com os Termos de Serviço e Política de Privacidade para se registrar.",
           "aboutContent": `
 # O Efeito Cascata da IA: Uma Estrutura para Prever as Próximas Necessidades da Humanidade
 

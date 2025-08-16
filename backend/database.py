@@ -36,20 +36,35 @@ def create_user_table():
                 CREATE TABLE IF NOT EXISTS users (
                     id SERIAL PRIMARY KEY,
                     email TEXT NOT NULL UNIQUE,
-                    hashed_password TEXT NOT NULL
+                    hashed_password TEXT NOT NULL,
+                    terms_agreed BOOLEAN DEFAULT FALSE,
+                    terms_agreed_at TIMESTAMP WITH TIME ZONE,
+                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
                 )
+                '''
+            )
+            # Add columns to existing table if they don't exist
+            cursor.execute(
+                '''
+                ALTER TABLE users 
+                ADD COLUMN IF NOT EXISTS terms_agreed BOOLEAN DEFAULT FALSE,
+                ADD COLUMN IF NOT EXISTS terms_agreed_at TIMESTAMP WITH TIME ZONE,
+                ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
                 '''
             )
         conn.commit()
 
-def create_user(email, password):
+def create_user(email, password, terms_agreed=False):
     hashed_password = pwd_context.hash(password)
+    terms_agreed_at = datetime.now(timezone.utc) if terms_agreed else None
+    
     with get_db() as conn:
         with conn.cursor() as cursor:
             try:
                 cursor.execute(
-                    "INSERT INTO users (email, hashed_password) VALUES (%s, %s) RETURNING id, email",
-                    (email, hashed_password),
+                    """INSERT INTO users (email, hashed_password, terms_agreed, terms_agreed_at) 
+                       VALUES (%s, %s, %s, %s) RETURNING id, email""",
+                    (email, hashed_password, terms_agreed, terms_agreed_at),
                 )
                 new_user = cursor.fetchone()
                 conn.commit()

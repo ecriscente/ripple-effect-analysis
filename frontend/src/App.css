@@ -417,6 +417,53 @@ body.dark-mode .auth-container input {
   font-size: 1.1rem;
 }
 
+.auth-container button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.terms-agreement {
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.terms-agreement label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  line-height: 1.5;
+  cursor: pointer;
+  text-align: left;
+}
+
+.terms-agreement input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--primary-color-light);
+  transform: scale(1.2);
+}
+
+body.dark-mode .terms-agreement input[type="checkbox"] {
+  accent-color: var(--primary-color-dark);
+}
+
+.terms-agreement a {
+  color: var(--primary-color-light);
+  text-decoration: none;
+}
+
+.terms-agreement a:hover {
+  text-decoration: underline;
+}
+
+body.dark-mode .terms-agreement a {
+  color: var(--primary-color-dark);
+}
+
 
 
 /* Markdown Content Styles */

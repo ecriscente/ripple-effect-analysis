@@ -56,8 +56,12 @@
     ```
     The frontend will typically be running at `http://localhost:5173` (or another available port).
 
+### Live Application
+
+The application is deployed and available at: **https://ripple-effect.erion.dev**
+
 ### Usage
 
 1.  Ensure both the backend and frontend servers are running.
-2.  Open your web browser and navigate to the frontend URL (e.g., `http://localhost:5173`).
+2.  Open your web browser and navigate to the frontend URL (e.g., `http://localhost:5173`) or visit the live application.
 3.  Enter an emerging technology in the input field and click "Analyze" to get the Ripple Effect Analysis.

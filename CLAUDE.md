@@ -86,7 +86,7 @@ POSTGRES_PORT=5432
 - No frontend test framework currently configured
 
 ### Database Schema
-- **users**: id, email, hashed_password
+- **users**: id, email, hashed_password, terms_agreed, terms_agreed_at, created_at
 - **analyses**: id, user_id, technology, analysis_result (JSON), created_at
 - **password_reset_tokens**: user_id, token, expires_at
 
@@ -94,7 +94,8 @@ POSTGRES_PORT=5432
 - Frontend builds to static files via Vite
 - Backend deployable as ASGI application
 - PostgreSQL database via Docker Compose
-- CORS configured for localhost development and ngrok tunneling
+- CORS configured for localhost development and production
+- **Live Application**: https://ripple-effect.erion.dev
 
 ## Project Context & Vision
 
