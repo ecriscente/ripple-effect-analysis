@@ -23,6 +23,17 @@ const AnalysisDetail = () => {
   const [error, setError] = useState('');
   const { t } = useTranslation();
 
+  const formatMarkdown = (text: string): string => {
+    return text
+      .replace(/###\s*(.*?)$/gm, '<h3>$1</h3>')                    // ### headers
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')            // **bold text**
+      .replace(/([^*\n]*?):\*\*(?:\s|$)/gm, '<strong>$1:</strong> ') // text:** patterns
+      .replace(/([^*\n]*?)\*\*(?:\s|$)/gm, '<strong>$1</strong> ') // text** patterns (no colon)
+      .replace(/\*([^*\n]+)\*/g, '<em>$1</em>')                    // *italic*
+      .replace(/`([^`]+)`/g, '<code>$1</code>')                    // `code`
+      .replace(/\n/g, '<br>');                                     // line breaks
+  };
+
   useEffect(() => {
     const fetchAnalysis = async () => {
       setIsLoading(true);
@@ -74,7 +85,7 @@ const AnalysisDetail = () => {
             <h2>{analysis.primary_ripples.title}</h2>
             <ul>
               {analysis.primary_ripples.points.map((point: string, index: number) => (
-                <li key={index} dangerouslySetInnerHTML={{ __html: point.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}></li>
+                <li key={index} dangerouslySetInnerHTML={{ __html: formatMarkdown(point) }}></li>
               ))}
             </ul>
           </div>
@@ -82,7 +93,7 @@ const AnalysisDetail = () => {
             <h2>{analysis.secondary_ripples.title}</h2>
             <ul>
               {analysis.secondary_ripples.points.map((point: string, index: number) => (
-                <li key={index} dangerouslySetInnerHTML={{ __html: point.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}></li>
+                <li key={index} dangerouslySetInnerHTML={{ __html: formatMarkdown(point) }}></li>
               ))}
             </ul>
           </div>
@@ -90,7 +101,7 @@ const AnalysisDetail = () => {
             <h2>{analysis.synthesis.title}</h2>
             <ul>
               {analysis.synthesis.points.map((point: string, index: number) => (
-                <li key={index} dangerouslySetInnerHTML={{ __html: point.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}></li>
+                <li key={index} dangerouslySetInnerHTML={{ __html: formatMarkdown(point) }}></li>
               ))}
             </ul>
           </div>
