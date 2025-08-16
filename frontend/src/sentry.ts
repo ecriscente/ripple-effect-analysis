@@ -17,13 +17,7 @@ export const initSentry = () => {
     // For example, automatic IP address collection on events
     sendDefaultPii: true,
     integrations: [
-      Sentry.browserTracingIntegration({
-        // Set tracing origins to connect Sentry with Request Performance
-        tracePropagationTargets: [
-          "localhost",
-          /^https:\/\/yourapp\.com\/api/,
-        ],
-      }),
+      Sentry.browserTracingIntegration(),
     ],
     // Performance Monitoring
     tracesSampleRate: ENVIRONMENT === 'production' ? 0.1 : 1.0,
@@ -80,7 +74,7 @@ export const clearUserContext = () => {
 
 // Performance monitoring
 export const startTransaction = (name: string, operation: string) => {
-  return Sentry.startTransaction({ name, op: operation });
+  return Sentry.startSpan({ name, op: operation }, () => {});
 };
 
 // Breadcrumb for user actions

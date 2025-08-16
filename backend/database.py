@@ -4,6 +4,11 @@ import psycopg
 from passlib.context import CryptContext
 from psycopg import errors
 from datetime import datetime, timezone
+from urllib.parse import quote_plus
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Database connection details from environment variables
 DB_NAME = os.getenv("POSTGRES_DB", "zeitgeist_db")
@@ -12,8 +17,11 @@ DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "password")
 DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
 DB_PORT = os.getenv("POSTGRES_PORT", "5432")
 
+# URL encode password to handle special characters
+DB_PASSWORD_ENCODED = quote_plus(DB_PASSWORD)
+
 # Connection string
-DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD_ENCODED}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

@@ -109,7 +109,7 @@ function App() {
         <h2>Something went wrong</h2>
         <p>We've been notified of this error and will fix it soon.</p>
         <button onClick={resetError}>Try again</button>
-        {import.meta.env.DEV && <pre>{error.toString()}</pre>}
+        {import.meta.env.DEV && <pre>{error instanceof Error ? error.toString() : 'Unknown error'}</pre>}
       </div>
     )}>
       <Router>

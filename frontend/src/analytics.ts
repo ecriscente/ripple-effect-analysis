@@ -47,7 +47,7 @@ export const trackUserRegistration = (method: string) => {
 export const trackUserLogin = (method: string, userId?: string) => {
   // Set user ID for better tracking
   if (userId && window.gtag) {
-    window.gtag('config', GA_MEASUREMENT_ID, {
+    window.gtag('config', 'G-GDMS3BXY7R', {
       user_id: userId
     });
   }
