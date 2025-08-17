@@ -7,9 +7,13 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const { t } = useTranslation();
 
     const handleLogin = async () => {
+        setIsLoading(true);
+        setError('');
+        
         try {
             const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/login`, {
                 method: 'POST',
@@ -32,6 +36,8 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
 
         } catch (err) {
             setError(err instanceof Error ? err.message : t('unknownError'));
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -50,7 +56,16 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t('password')}
             />
-            <button onClick={handleLogin}>{t('login')}</button>
+            <button onClick={handleLogin} disabled={isLoading}>
+                {isLoading ? (
+                    <span className="loading-button">
+                        <span className="spinner"></span>
+                        {t('loggingIn')}
+                    </span>
+                ) : (
+                    t('login')
+                )}
+            </button>
             {error && <p className="error">{error}</p>}
             <p>
                 <Link to="/forgot-password">{t('forgotPassword')}</Link>
