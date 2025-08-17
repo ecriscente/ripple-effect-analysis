@@ -39,6 +39,12 @@ if sentry_dsn:
 
 app = FastAPI()
 
+# Environment validation
+required_env_vars = ["POSTGRES_HOST", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_DB"]
+missing_vars = [var for var in required_env_vars if not os.getenv(var)]
+if missing_vars:
+    print(f"Warning: Missing environment variables: {missing_vars}")
+
 frontend_production_url = "https://ripple-effect.erion.dev"
 
 origins = [
@@ -81,9 +87,16 @@ class ResetPasswordRequest(BaseModel):
 
 @app.on_event("startup")
 def startup_db_client():
-    db.create_user_table()
-    db.create_analysis_table()
-    db.create_password_reset_table()
+    try:
+        db.create_user_table()
+        db.create_analysis_table()
+        db.create_password_reset_table()
+        print("Database tables created successfully")
+    except Exception as e:
+        print(f"Warning: Database initialization failed: {e}")
+        # Don't crash the app, just log the error
+        if sentry_dsn:
+            sentry_sdk.capture_exception(e)
 
 @app.post("/api/forgot-password")
 async def forgot_password(request: ForgotPasswordRequest):
