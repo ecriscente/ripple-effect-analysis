@@ -56,6 +56,14 @@ const Dashboard = () => {
       {error && <p className="error">{error}</p>}
       {isLoading ? (
         <div className="loader"></div>
+      ) : analyses.length === 0 ? (
+        <div className="empty-state">
+          <h3>{t('noAnalysesYet')}</h3>
+          <p>{t('emptyDashboardMessage')}</p>
+          <Link to="/" className="empty-state-button">
+            {t('startFirstAnalysis')}
+          </Link>
+        </div>
       ) : (
         <ul>
           {analyses.map((analysis) => (
