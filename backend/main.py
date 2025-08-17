@@ -226,6 +226,15 @@ async def get_single_analysis(analysis_id: int, token: str = Depends(oauth2_sche
 
     return analysis
 
+@app.get("/health")
+async def health_check():
+    """Simple health check endpoint for keep-alive monitoring services."""
+    return {
+        "status": "healthy",
+        "timestamp": datetime.utcnow().isoformat(),
+        "service": "ripple-effect-analysis-backend"
+    }
+
 @app.get("/", response_class=HTMLResponse)
 async def root():
     return """
@@ -237,6 +246,7 @@ async def root():
       <body>
         <h1>Ripple Effect Analysis API</h1>
         <p>If you see this page, your backend is running and ngrok can be approved.</p>
+        <p><a href="/health">Health Check</a> | <a href="/docs">API Documentation</a></p>
       </body>
     </html>
     """

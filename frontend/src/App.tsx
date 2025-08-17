@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import i18n from 'i18next'; // Import i18n to manage language state
 import { trackPageView, trackThemeToggle, trackLanguageChange } from './analytics';
 import { initSentry, SentryErrorBoundary, setUserContext, clearUserContext, addBreadcrumb } from './sentry';
+import { useBackendKeepAlive } from './hooks/useBackendKeepAlive';
 
 import ForgotPassword from './ForgotPassword';
 import ResetPassword from './ResetPassword';
@@ -49,6 +50,17 @@ const Home = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [theme, setTheme] = useState('light');
+
+  // Keep backend alive during business hours
+  const now = new Date();
+  const hour = now.getHours();
+  const isBusinessHours = hour >= 8 && hour <= 20;
+  
+  // Activate keep-alive during business hours
+  if (isBusinessHours) {
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://ripple-effect-analysis.onrender.com';
+    useBackendKeepAlive(apiBaseUrl, 600000); // 10 minutes
+  }
 
   const checkAuthStatus = () => {
     const token = localStorage.getItem('token');

@@ -7,9 +7,9 @@ This guide walks you through deploying your Ripple Effect Analysis app using **1
 - [x] ✅ Supabase PostgreSQL database configured
 - [x] ✅ Google Analytics and Sentry integrated
 - [x] ✅ GitHub repository with latest code
-- [ ] 🔧 Vercel account setup
-- [ ] 🔧 Render account setup  
-- [ ] 🔧 GitHub Secrets configured
+- [x] ✅ Vercel account setup
+- [x] ✅ Render account setup  
+- [ ] 🔧 GitHub Secrets configured (optional - only needed for custom CI/CD)
 
 ## 🎯 **Deployment Stack (100% Free)**
 
@@ -34,6 +34,8 @@ This guide walks you through deploying your Ripple Effect Analysis app using **1
    - `VITE_GA_MEASUREMENT_ID` = `G-GDMS3BXY7R`
    - `VITE_SENTRY_DSN` = `https://8e91d8e566d04d5c0612fe637220c804@o4509854703616000.ingest.de.sentry.io/4509854706106448`
 4. **Deploy** - Vercel will give you a URL like `https://ripple-effect-analysis.vercel.app`
+   
+   > **Note**: Vercel's GitHub integration automatically handles deployments when you push to your main branch. GitHub secrets are only needed if you want custom CI/CD workflows.
 
 ### **2. Setup Render (Backend Hosting)**
 
@@ -67,7 +69,11 @@ This guide walks you through deploying your Ripple Effect Analysis app using **1
    - `VITE_API_BASE_URL` = `https://your-backend-url.onrender.com` (from step 2)
 3. **Redeploy** frontend
 
-### **4. Setup GitHub Secrets (CI/CD)**
+### **4. Setup GitHub Secrets (CI/CD) - OPTIONAL**
+
+> **Skip this section if using Vercel's built-in GitHub integration** - your deployments will work automatically without these secrets.
+
+**Only set up GitHub secrets if you need custom CI/CD workflows or programmatic deployments.**
 
 1. **Go to your GitHub repository** → Settings → Secrets and variables → Actions
 2. **Add Repository Secrets**:
@@ -89,12 +95,14 @@ This guide walks you through deploying your Ripple Effect Analysis app using **1
 
 ## 🔄 **CI/CD Workflow**
 
-Once setup is complete:
+**Basic Setup (Vercel + Render GitHub Integration):**
+- **Frontend Changes**: Auto-deploy to Vercel when pushed to main
+- **Backend Changes**: Auto-deploy to Render when pushed to main
 
+**Advanced Setup (with GitHub Secrets):**
 - **Pull Requests**: Automatic testing + preview deployments
 - **Merge to Main**: Automatic deployment to production
-- **Frontend Changes**: Auto-deploy to Vercel
-- **Backend Changes**: Auto-deploy to Render
+- **Custom Workflows**: Use GitHub Actions for complex CI/CD pipelines
 
 ## 🎯 **Final URLs**
 
