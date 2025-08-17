@@ -41,6 +41,12 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
         }
     };
 
+    const handleKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && !isLoading) {
+            handleLogin();
+        }
+    };
+
     return (
         <div className="auth-container">
             <h2>{t('login')}</h2>
@@ -48,12 +54,14 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onKeyPress={handleKeyPress}
                 placeholder={t('email')}
             />
             <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onKeyPress={handleKeyPress}
                 placeholder={t('password')}
             />
             <button onClick={handleLogin} disabled={isLoading}>
