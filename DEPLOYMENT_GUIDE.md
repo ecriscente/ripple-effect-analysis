@@ -8,15 +8,14 @@ This guide walks you through deploying your Ripple Effect Analysis app using **1
 - [x] ✅ Google Analytics and Sentry integrated
 - [x] ✅ GitHub repository with latest code
 - [x] ✅ Vercel account setup
-- [x] ✅ Render account setup  
-- [ ] 🔧 GitHub Secrets configured (optional - only needed for custom CI/CD)
+- [x] ✅ Render account setup
 
 ## 🎯 **Deployment Stack (100% Free)**
 
 - **Frontend**: Vercel (unlimited personal projects)
 - **Backend**: Render (750 hours/month, sleeps after 15min)
 - **Database**: Supabase PostgreSQL (500MB free)
-- **CI/CD**: GitHub Actions (2,000 minutes/month)
+- **CI/CD**: Built-in platform integrations (GitHub → Vercel/Render)
 
 ## 📋 **Step-by-Step Setup**
 
@@ -31,8 +30,8 @@ This guide walks you through deploying your Ripple Effect Analysis app using **1
    - **Output Directory**: `dist`
 3. **Add Environment Variables**:
    - `VITE_API_BASE_URL` = `https://your-app-name.onrender.com` (we'll get this from Render)
-   - `VITE_GA_MEASUREMENT_ID` = `G-GDMS3BXY7R`
-   - `VITE_SENTRY_DSN` = `https://8e91d8e566d04d5c0612fe637220c804@o4509854703616000.ingest.de.sentry.io/4509854706106448`
+   - `VITE_GA_MEASUREMENT_ID` = `your-google-analytics-id`
+   - `VITE_SENTRY_DSN` = `your-sentry-frontend-dsn`
 4. **Deploy** - Vercel will give you a URL like `https://ripple-effect-analysis.vercel.app`
    
    > **Note**: Vercel's GitHub integration automatically handles deployments when you push to your main branch. GitHub secrets are only needed if you want custom CI/CD workflows.
@@ -48,16 +47,16 @@ This guide walks you through deploying your Ripple Effect Analysis app using **1
    - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port 8000`
 3. **Add Environment Variables**:
    ```
-   POSTGRES_DB=postgres
-   POSTGRES_USER=postgres.nkqakhgthjwrfqsznykw
-   POSTGRES_PASSWORD=x$fS2Gt7phh5T@Z
-   POSTGRES_HOST=aws-1-sa-east-1.pooler.supabase.com
+   POSTGRES_DB=your_database_name
+   POSTGRES_USER=your_supabase_user
+   POSTGRES_PASSWORD=your_supabase_password
+   POSTGRES_HOST=your_supabase_host
    POSTGRES_PORT=6543
-   SECRET_KEY=d66bbff9a3227ca1d95a8ae72ec83243ce6138b291bfdc6ddc9becf5984c6373
-   GEMINI_API_KEY=AIzaSyB9v_KHyxQCE-Faj_JPSdA0oe7eXnNCfEo
-   SENDGRID_API_KEY=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
-   SENDGRID_FROM_EMAIL=me@erion.dev
-   SENTRY_DSN=https://5a7af04cc223e8c0787ab14736260eab@o4509854703616000.ingest.de.sentry.io/4509854735990864
+   SECRET_KEY=your_secret_key_for_jwt
+   GEMINI_API_KEY=your_google_gemini_api_key
+   SENDGRID_API_KEY=your_sendgrid_api_key
+   SENDGRID_FROM_EMAIL=your_verified_sender_email
+   SENTRY_DSN=your_sentry_backend_dsn
    ENVIRONMENT=production
    ```
 4. **Deploy** - Render will give you a URL like `https://ripple-effect-analysis.onrender.com`
@@ -69,40 +68,14 @@ This guide walks you through deploying your Ripple Effect Analysis app using **1
    - `VITE_API_BASE_URL` = `https://your-backend-url.onrender.com` (from step 2)
 3. **Redeploy** frontend
 
-### **4. Setup GitHub Secrets (CI/CD) - OPTIONAL**
+## 🔄 **Automatic Deployment**
 
-> **Skip this section if using Vercel's built-in GitHub integration** - your deployments will work automatically without these secrets.
+Your deployment is now fully automated through platform integrations:
 
-**Only set up GitHub secrets if you need custom CI/CD workflows or programmatic deployments.**
-
-1. **Go to your GitHub repository** → Settings → Secrets and variables → Actions
-2. **Add Repository Secrets**:
-
-   **Vercel Secrets:**
-   - `VERCEL_TOKEN` = (Get from Vercel Settings → Tokens)
-   - `VERCEL_ORG_ID` = (Get from Vercel Project Settings)
-   - `VERCEL_PROJECT_ID` = (Get from Vercel Project Settings)
-
-   **Render Secrets:**
-   - `RENDER_API_KEY` = (Get from Render Account Settings → API Keys)
-   - `RENDER_SERVICE_ID` = (Get from Render Service Settings)
-
-   **App Secrets:**
-   - `VITE_GA_MEASUREMENT_ID` = `G-GDMS3BXY7R`
-   - `VITE_SENTRY_DSN` = `https://8e91d8e566d04d5c0612fe637220c804@o4509854703616000.ingest.de.sentry.io/4509854706106448`
-   - `VITE_API_BASE_URL` = `https://your-backend-url.onrender.com`
-   - `GEMINI_API_KEY` = `AIzaSyB9v_KHyxQCE-Faj_JPSdA0oe7eXnNCfEo`
-
-## 🔄 **CI/CD Workflow**
-
-**Basic Setup (Vercel + Render GitHub Integration):**
 - **Frontend Changes**: Auto-deploy to Vercel when pushed to main
 - **Backend Changes**: Auto-deploy to Render when pushed to main
-
-**Advanced Setup (with GitHub Secrets):**
-- **Pull Requests**: Automatic testing + preview deployments
-- **Merge to Main**: Automatic deployment to production
-- **Custom Workflows**: Use GitHub Actions for complex CI/CD pipelines
+- **No configuration needed**: GitHub workflows and secrets are not required
+- **Instant deployments**: Push to main branch triggers automatic builds
 
 ## 🎯 **Final URLs**
 
