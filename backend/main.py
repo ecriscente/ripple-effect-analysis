@@ -43,7 +43,9 @@ frontend_production_url = "https://ripple-effect.erion.dev"
 
 origins = [
     "http://localhost:5173",      # Your local dev environment
-    frontend_production_url       # Your production frontend
+    "https://localhost:5173",     # Local HTTPS
+    frontend_production_url,      # Your production frontend
+    "https://ripple-effect-analysis.vercel.app"  # Vercel default domain
 ]
 
 # Configure CORS
@@ -229,11 +231,22 @@ async def get_single_analysis(analysis_id: int, token: str = Depends(oauth2_sche
 @app.get("/health")
 async def health_check():
     """Simple health check endpoint for keep-alive monitoring services."""
-    return {
-        "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat(),
-        "service": "ripple-effect-analysis-backend"
-    }
+    try:
+        # Test database connection
+        db.create_user_table()
+        return {
+            "status": "healthy",
+            "timestamp": datetime.utcnow().isoformat(),
+            "service": "ripple-effect-analysis-backend",
+            "database": "connected"
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "timestamp": datetime.utcnow().isoformat(),
+            "service": "ripple-effect-analysis-backend",
+            "error": str(e)
+        }
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
