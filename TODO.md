@@ -1,5 +1,39 @@
 # Ripple Effect Analysis - TODO
 
+## Critical UX Improvements (Before New Features)
+
+### Analysis User Experience
+- [ ] **Progress Feedback for Analysis:**
+  - [ ] **Frontend:** Add real-time progress indicators during analysis processing
+  - [ ] **Frontend:** Display status messages (e.g., "Validating technology...", "Analyzing primary ripples...", "Generating synthesis...")
+  - [ ] **Frontend:** Show estimated time remaining or progress percentage
+  - [ ] **Backend:** Consider implementing streaming responses or progress callbacks
+  - [ ] **Frontend:** Add timeout handling and retry mechanisms for long-running analyses
+
+### Authentication & Security
+- [ ] **Password Confirmation:**
+  - [ ] **Frontend:** Add "Confirm Password" field to registration form
+  - [ ] **Frontend:** Add client-side validation to ensure passwords match
+  - [ ] **Frontend:** Update form validation and error messages
+  - [ ] **Backend:** Consider adding server-side password confirmation validation
+
+- [ ] **Email Verification:**
+  - [ ] **Backend:** Implement email verification tokens and database schema
+  - [ ] **Backend:** Create email verification endpoint and email templates
+  - [ ] **Backend:** Modify registration flow to send verification emails
+  - [ ] **Frontend:** Add email verification status indicators
+  - [ ] **Frontend:** Create email verification confirmation page
+  - [ ] **Backend:** Restrict analysis access to verified email addresses only
+
+### Premium Service Contact
+- [ ] **Manual Deep Research Option:**
+  - [ ] **Frontend:** Add "Request Deep Research" section after analysis results
+  - [ ] **Frontend:** Display contact information (me@erion.dev) for manual analysis requests
+  - [ ] **Frontend:** Include pricing information and turnaround time for manual service
+  - [ ] **Frontend:** Add explanation of deep research benefits vs automated analysis
+  - [ ] **Frontend:** Provide contact form or direct email link with pre-filled subject
+  - [ ] **Backend:** Track interest in manual service for analytics
+
 ## Pre-Deployment: Analytics & Monitoring
 
 - [ ] **Google Analytics:**
