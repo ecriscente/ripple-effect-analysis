@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 
 // Custom hook for keeping backend alive
 export const useBackendKeepAlive = (apiBaseUrl: string, interval: number = 600000) => {
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<number | null>(null);
 
   useEffect(() => {
     const pingBackend = async () => {
