@@ -242,6 +242,7 @@ async def get_single_analysis(analysis_id: int, token: str = Depends(oauth2_sche
     return analysis
 
 @app.get("/health")
+@app.head("/health")
 async def health_check():
     """Simple health check endpoint for keep-alive monitoring services."""
     try:
