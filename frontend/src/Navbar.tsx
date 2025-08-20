@@ -49,11 +49,25 @@ const Navbar = ({ isAuthenticated, handleLogout, theme, toggleTheme }: NavbarPro
       <div className="navbar-brand">
         <Link to="/" onClick={closeMenu}>{t('zeitgeistEngine')}</Link>
       </div>
+      
+      {/* Show auth buttons prominently on mobile when not authenticated */}
+      {!isAuthenticated && (
+        <div className="mobile-auth-buttons">
+          <Link to="/login" className="mobile-login-btn" onClick={closeMenu}>
+            {t('login')}
+          </Link>
+          <Link to="/register" className="mobile-register-btn" onClick={closeMenu}>
+            {t('register')}
+          </Link>
+        </div>
+      )}
+      
       <button className="hamburger-menu" onClick={toggleMenu}>
         <span className="hamburger-icon"></span>
         <span className="hamburger-icon"></span>
         <span className="hamburger-icon"></span>
       </button>
+      
       <div className={`navbar-links ${isOpen ? 'open' : ''}`}>
         <Link to="/" onClick={closeMenu}>{t('home')}</Link>
         {isAuthenticated ? (

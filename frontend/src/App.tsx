@@ -30,8 +30,105 @@ const AnalyticsTracker = () => {
   return null;
 };
 
+// Floating CTA Button for mobile non-authenticated users
+const FloatingCTA = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // Show floating CTA on mobile for non-authenticated users on homepage
+    const shouldShow = !isAuthenticated && 
+                      location.pathname === '/' && 
+                      window.innerWidth <= 768;
+    setIsVisible(shouldShow);
+
+    // Handle window resize
+    const handleResize = () => {
+      const shouldShow = !isAuthenticated && 
+                        location.pathname === '/' && 
+                        window.innerWidth <= 768;
+      setIsVisible(shouldShow);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isAuthenticated, location.pathname]);
+
+  const handleClick = () => {
+    navigate('/register');
+  };
+
+  if (!isVisible) return null;
+
+  return (
+    <button 
+      className="floating-cta show-mobile" 
+      onClick={handleClick}
+      aria-label={t('getStarted')}
+    >
+      {t('getStarted')}
+    </button>
+  );
+};
+
+// Hero Section Component for non-authenticated users
+const HeroSection = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    navigate('/register');
+  };
+
+  const handleTryDemo = () => {
+    navigate('/login');
+  };
+
+  return (
+    <div className="hero-section">
+      <div className="hero-content">
+        <h1 className="hero-title">{t('heroTitle')}</h1>
+        <p className="hero-subtitle">{t('heroSubtitle')}</p>
+        
+        <div className="hero-actions">
+          <button className="cta-primary" onClick={handleGetStarted}>
+            {t('tryItNow')}
+          </button>
+          <button className="cta-secondary" onClick={handleTryDemo}>
+            {t('login')}
+          </button>
+        </div>
+        
+        <p className="hero-note">{t('noSignupRequired')}</p>
+        
+        {/* Preview of what users will get */}
+        <div className="feature-preview">
+          <h3>{t('whatYouGet')}</h3>
+          <div className="preview-items">
+            <div className="preview-item">
+              <strong>{t('primaryRipples')}</strong>
+              <p>{t('primaryRipplesDescription')}</p>
+            </div>
+            <div className="preview-item">
+              <strong>{t('secondaryRipples')}</strong>
+              <p>{t('secondaryRipplesDescription')}</p>
+            </div>
+            <div className="preview-item">
+              <strong>{t('synthesis')}</strong>
+              <p>{t('synthesisDescription')}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Home = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   const { t } = useTranslation();
+  const [showFullArticle, setShowFullArticle] = useState(false);
 
   return (
     <div className="about">
@@ -43,7 +140,23 @@ const Home = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
       {isAuthenticated ? (
         <AnalysisForm />
       ) : (
-        <div className="markdown-content" dangerouslySetInnerHTML={{ __html: marked(t('aboutContent')) }} />
+        <>
+          <HeroSection />
+          
+          {/* Collapsible detailed article */}
+          <div className="article-section">
+            <button 
+              className="toggle-article-btn"
+              onClick={() => setShowFullArticle(!showFullArticle)}
+            >
+              {showFullArticle ? t('hideHelp') : t('learnMore')}
+            </button>
+            
+            {showFullArticle && (
+              <div className="markdown-content" dangerouslySetInnerHTML={{ __html: marked(t('aboutContent')) }} />
+            )}
+          </div>
+        </>
       )}
     </div>
   );
@@ -139,6 +252,7 @@ const AppContent = () => {
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/verify-email" element={<EmailVerification />} />
         </Routes>
+        <FloatingCTA isAuthenticated={isAuthenticated} />
       </div>
     </>
   );
