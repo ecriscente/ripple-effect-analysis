@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import './App.css';
 import { marked } from 'marked';
 import Login from './Login';
@@ -47,9 +47,10 @@ const Home = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   );
 }
 
-function App() {
+const AppContent = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [theme, setTheme] = useState('light');
+  const navigate = useNavigate();
 
   // Keep backend alive during business hours
   const now = new Date();
@@ -112,9 +113,34 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     checkAuthStatus();
-    window.location.href = '/login';
+    navigate('/login');
   };
 
+  return (
+    <>
+      <AnalyticsTracker />
+      <div className="container">
+        <Navbar
+          isAuthenticated={isAuthenticated}
+          handleLogout={handleLogout}
+          theme={theme}
+          toggleTheme={toggleTheme}
+        />
+        <Routes>
+          <Route path="/" element={<Home isAuthenticated={isAuthenticated} />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/analysis/:id" element={<AnalysisDetail />} />
+          <Route path="/login" element={<Login onLogin={checkAuthStatus} />} />
+          <Route path="/register" element={<Register onRegister={checkAuthStatus} />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+        </Routes>
+      </div>
+    </>
+  );
+};
+
+function App() {
   return (
     <SentryErrorBoundary fallback={({ error, resetError }) => (
       <div className="error-boundary">
@@ -125,24 +151,7 @@ function App() {
       </div>
     )}>
       <Router>
-        <AnalyticsTracker />
-        <div className="container">
-          <Navbar
-            isAuthenticated={isAuthenticated}
-            handleLogout={handleLogout}
-            theme={theme}
-            toggleTheme={toggleTheme}
-          />
-          <Routes>
-            <Route path="/" element={<Home isAuthenticated={isAuthenticated} />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/analysis/:id" element={<AnalysisDetail />} />
-            <Route path="/login" element={<Login onLogin={checkAuthStatus} />} />
-            <Route path="/register" element={<Register onRegister={checkAuthStatus} />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password/:token" element={<ResetPassword />} />
-          </Routes>
-        </div>
+        <AppContent />
       </Router>
     </SentryErrorBoundary>
   );

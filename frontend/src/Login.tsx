@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { trackUserLogin } from './analytics';
 
 const Login = ({ onLogin }: { onLogin: () => void }) => {
@@ -9,6 +9,7 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     const handleLogin = async () => {
         setIsLoading(true);
@@ -32,7 +33,7 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
             localStorage.setItem('token', data.access_token);
             trackUserLogin('email');
             onLogin(); // Notify parent component
-            window.location.href = '/';
+            navigate('/');
 
         } catch (err) {
             setError(err instanceof Error ? err.message : t('unknownError'));

@@ -48,7 +48,7 @@ const Dashboard = () => {
     };
 
     fetchAnalyses();
-  }, [t]);
+  }, []); // Remove 't' dependency to prevent refetch on language change
 
   return (
     <div className="dashboard">

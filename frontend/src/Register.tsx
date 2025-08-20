@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { trackUserRegistration } from './analytics';
 
 const Register = ({ onRegister }: { onRegister: () => void }) => {
@@ -8,6 +9,7 @@ const Register = ({ onRegister }: { onRegister: () => void }) => {
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [error, setError] = useState('');
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     const handleRegister = async () => {
         if (!agreedToTerms) {
@@ -32,7 +34,7 @@ const Register = ({ onRegister }: { onRegister: () => void }) => {
             trackUserRegistration('email');
             onRegister(); // Notify parent component
             // Handle successful registration, e.g., redirect to login
-            window.location.href = '/login';
+            navigate('/login');
 
         } catch (err) {
             setError(err instanceof Error ? err.message : t('unknownError'));
