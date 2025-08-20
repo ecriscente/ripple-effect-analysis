@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthenticatedFetch } from './hooks/useAuthenticatedFetch';
+import BetaUsageCard from './components/BetaUsageCard';
 
 interface AnalysisSummary {
   0: number; // id
@@ -43,6 +44,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       <h2>{t('myAnalyses')}</h2>
+      <BetaUsageCard />
       {error && <p className="error">{error}</p>}
       {isLoading ? (
         <div className="loader"></div>

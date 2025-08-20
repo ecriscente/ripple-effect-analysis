@@ -8,6 +8,7 @@ import Dashboard from './Dashboard';
 import AnalysisDetail from './AnalysisDetail';
 import AnalysisForm from './AnalysisForm';
 import Navbar from './Navbar'; // Import the new Navbar component
+import BetaBanner from './components/BetaBanner';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next'; // Import i18n to manage language state
 import { trackPageView, trackThemeToggle, trackLanguageChange } from './analytics';
@@ -119,6 +120,7 @@ const AppContent = () => {
   return (
     <>
       <AnalyticsTracker />
+      <BetaBanner />
       <div className="container">
         <Navbar
           isAuthenticated={isAuthenticated}

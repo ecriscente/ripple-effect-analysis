@@ -93,6 +93,10 @@ i18n
             "🎪 The show is about to begin!",
             "🍿 Grab some popcorn, insights incoming!"
           ],
+          "betaBanner": {
+            "message": "🚀 You're part of our exclusive beta! Help us optimize for the full launch.",
+            "dismiss": "Dismiss"
+          },
           "aboutContent": `
 # The Ripple Effect of AI: A Framework for Predicting Humanity's Next Necessities
 
@@ -237,6 +241,10 @@ The question for every innovator is no longer just "What can this technology do?
             "🎪 O show está prestes a começar!",
             "🍿 Pegue a pipoca, insights chegando!"
           ],
+          "betaBanner": {
+            "message": "🚀 Você faz parte do nosso beta exclusivo! Nos ajude a otimizar para o lançamento completo.",
+            "dismiss": "Dispensar"
+          },
           "aboutContent": `
 # O Efeito Cascata da IA: Uma Estrutura para Prever as Próximas Necessidades da Humanidade
 

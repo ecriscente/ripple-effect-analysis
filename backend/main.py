@@ -19,6 +19,8 @@ from llm_integration import get_analysis, validate_technology # Import validate_
 import database as db
 import auth
 import email_service
+from usage_limits import UsageLimiter
+from config import FEATURE_FLAGS, get_beta_status
 
 from fastapi.responses import HTMLResponse
 
@@ -38,6 +40,18 @@ if sentry_dsn:
     print("Sentry initialized successfully")
 
 app = FastAPI()
+
+# Initialize usage limiter
+DB_NAME = os.getenv("POSTGRES_DB", "zeitgeist_db")
+DB_USER = os.getenv("POSTGRES_USER", "user")
+DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "password")
+DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
+DB_PORT = os.getenv("POSTGRES_PORT", "5432")
+from urllib.parse import quote_plus
+DB_PASSWORD_ENCODED = quote_plus(DB_PASSWORD)
+DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD_ENCODED}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+usage_limiter = UsageLimiter(DATABASE_URL)
 
 # Environment validation
 required_env_vars = ["POSTGRES_HOST", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_DB"]
@@ -167,6 +181,24 @@ async def analyze_technology(request: AnalysisRequest, token: str = Depends(oaut
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
+    # Check usage limits if enabled
+    if FEATURE_FLAGS.get("enable_analysis_limits", True):
+        can_analyze, reason, next_allowed = usage_limiter.can_user_analyze(
+            user[0], 
+            email_verified=False  # TODO: Check actual email verification status
+        )
+        
+        if not can_analyze:
+            # Add next allowed time to error response if available
+            error_detail = {"message": reason}
+            if next_allowed:
+                error_detail["next_allowed_at"] = next_allowed.isoformat()
+            
+            raise HTTPException(
+                status_code=429,  # Too Many Requests
+                detail=error_detail
+            )
+    
     try:
         # Add user context to Sentry
         sentry_sdk.set_user({"id": str(user[0]), "email": email})
@@ -189,6 +221,10 @@ async def analyze_technology(request: AnalysisRequest, token: str = Depends(oaut
         if not analysis_id:
             sentry_sdk.capture_message("Failed to save analysis to database", level="error")
             raise HTTPException(status_code=500, detail="Failed to save analysis.")
+
+        # Record successful analysis usage
+        if FEATURE_FLAGS.get("enable_analysis_limits", True):
+            usage_limiter.record_analysis(user[0])
 
         sentry_sdk.add_breadcrumb(
             message="Analysis completed successfully",
@@ -218,6 +254,33 @@ async def get_user_analyses(token: str = Depends(oauth2_scheme)):
     
     analyses = db.get_analyses_by_user_id(user[0])
     return analyses
+
+@app.get("/api/usage")
+async def get_user_usage(token: str = Depends(oauth2_scheme)):
+    """Get current user's usage statistics and limits"""
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    email = auth.verify_token(token, credentials_exception)
+    user = db.get_user(email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if FEATURE_FLAGS.get("enable_analysis_limits", True):
+        usage_stats = usage_limiter.get_user_usage_stats(
+            user[0],
+            email_verified=False  # TODO: Check actual email verification status
+        )
+        return usage_stats
+    else:
+        return {"limits_disabled": True}
+
+@app.get("/api/beta-status")
+async def get_beta_status_endpoint():
+    """Get current beta status and messaging for public display"""
+    return get_beta_status()
 
 @app.get("/api/analysis/{analysis_id}")
 async def get_single_analysis(analysis_id: int, token: str = Depends(oauth2_scheme)):

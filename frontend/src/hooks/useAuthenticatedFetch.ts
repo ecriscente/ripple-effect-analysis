@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -5,7 +6,7 @@ export const useAuthenticatedFetch = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const authenticatedFetch = async (url: string, options: RequestInit = {}) => {
+  const authenticatedFetch = useCallback(async (url: string, options: RequestInit = {}) => {
     const token = localStorage.getItem('token');
     
     if (!token) {
@@ -31,7 +32,7 @@ export const useAuthenticatedFetch = () => {
     }
 
     return response;
-  };
+  }, [navigate, t]); // Only recreate when navigate or t changes
 
   return authenticatedFetch;
 };
