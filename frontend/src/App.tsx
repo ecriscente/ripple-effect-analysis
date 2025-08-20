@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import './App.css';
 import { marked } from 'marked';
-import Login from './Login';
-import Register from './Register';
+import AuthFlow from './AuthFlow';
 import Dashboard from './Dashboard';
 import AnalysisDetail from './AnalysisDetail';
 import AnalysisForm from './AnalysisForm';
@@ -57,7 +56,7 @@ const FloatingCTA = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
   }, [isAuthenticated, location.pathname]);
 
   const handleClick = () => {
-    navigate('/register');
+    navigate('/auth');
   };
 
   if (!isVisible) return null;
@@ -79,7 +78,7 @@ const HeroSection = () => {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    navigate('/register');
+    navigate('/auth');
   };
 
   const handleTryDemo = () => {
@@ -246,8 +245,9 @@ const AppContent = () => {
           <Route path="/" element={<Home isAuthenticated={isAuthenticated} />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/analysis/:id" element={<AnalysisDetail />} />
-          <Route path="/login" element={<Login onLogin={checkAuthStatus} />} />
-          <Route path="/register" element={<Register onRegister={checkAuthStatus} />} />
+          <Route path="/auth" element={<AuthFlow onAuth={checkAuthStatus} />} />
+          <Route path="/login" element={<AuthFlow onAuth={checkAuthStatus} initialMode="login" />} />
+          <Route path="/register" element={<AuthFlow onAuth={checkAuthStatus} initialMode="register" />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/verify-email" element={<EmailVerification />} />

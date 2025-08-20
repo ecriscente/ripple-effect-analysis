@@ -56,7 +56,7 @@ const Navbar = ({ isAuthenticated, handleLogout, theme, toggleTheme }: NavbarPro
           <Link to="/login" className="mobile-login-btn" onClick={closeMenu}>
             {t('login')}
           </Link>
-          <Link to="/register" className="mobile-register-btn" onClick={closeMenu}>
+          <Link to="/auth" className="mobile-register-btn" onClick={closeMenu}>
             {t('register')}
           </Link>
         </div>
@@ -78,7 +78,7 @@ const Navbar = ({ isAuthenticated, handleLogout, theme, toggleTheme }: NavbarPro
         ) : (
           <>
             <Link to="/login" onClick={closeMenu}>{t('login')}</Link>
-            <Link to="/register" onClick={closeMenu}>{t('register')}</Link>
+            <Link to="/auth" onClick={closeMenu}>{t('register')}</Link>
           </>
         )}
         <button onClick={toggleTheme} className="theme-toggle-button">

@@ -101,6 +101,15 @@ class ResetPasswordRequest(BaseModel):
     token: str
     new_password: str
 
+class UserCheckRequest(BaseModel):
+    email: str
+
+class UnifiedAuthRequest(BaseModel):
+    email: str
+    password: str
+    action: str  # "login" or "register"
+    agreedToTerms: Optional[bool] = False
+
 @app.on_event("startup")
 def startup_db_client():
     global usage_limiter
@@ -290,6 +299,30 @@ async def register_user(user: UserCreate):
     else:
         return {"email": new_user[1]}
 
+@app.post("/api/check-user")
+async def check_user_exists(request: UserCheckRequest):
+    """
+    Check if a user exists without exposing sensitive data.
+    Returns whether user exists and needs to register or can login.
+    """
+    try:
+        # Normalize email (trim and lowercase)
+        email = request.email.strip().lower()
+        
+        # Check if user exists
+        db_user = db.get_user(email)
+        user_exists = db_user is not None
+        
+        return {
+            "exists": user_exists,
+            "needs_registration": not user_exists,
+            "email": email  # Return normalized email
+        }
+    except Exception as e:
+        print(f"Error checking user: {e}")
+        # Don't expose internal errors to client
+        raise HTTPException(status_code=500, detail="Unable to check user status")
+
 @app.post("/api/login")
 async def login_user(user: UserLogin):
     db_user = db.get_user(user.email)
@@ -301,6 +334,111 @@ async def login_user(user: UserLogin):
     
     access_token = auth.create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "bearer"}
+
+@app.post("/api/auth")
+async def unified_auth(request: UnifiedAuthRequest):
+    """
+    Unified authentication endpoint that handles both login and registration.
+    Provides clearer error messages and user guidance.
+    """
+    try:
+        # Normalize email
+        email = request.email.strip().lower()
+        
+        if request.action == "login":
+            # Handle login
+            db_user = db.get_user(email)
+            if not db_user:
+                raise HTTPException(
+                    status_code=400, 
+                    detail="We don't recognize this email. Would you like to create an account?"
+                )
+            
+            if not db.verify_password(request.password, db_user[2]):
+                raise HTTPException(
+                    status_code=400, 
+                    detail="Incorrect password. Try again or reset your password."
+                )
+            
+            access_token = auth.create_access_token(data={"sub": email})
+            return {"access_token": access_token, "token_type": "bearer", "action": "login"}
+            
+        elif request.action == "register":
+            # Handle registration
+            if db.get_user(email):
+                raise HTTPException(
+                    status_code=400, 
+                    detail="An account with this email already exists. Try logging in instead."
+                )
+            
+            # Simplified validation - just check terms agreement
+            if not request.agreedToTerms:
+                raise HTTPException(
+                    status_code=400, 
+                    detail="Please agree to the Terms of Service to create your account."
+                )
+            
+            # Create user with simplified password requirements
+            if len(request.password) < 8:
+                raise HTTPException(
+                    status_code=400, 
+                    detail="Password must be at least 8 characters long."
+                )
+            
+            new_user = db.create_user(email, request.password, request.agreedToTerms)
+            
+            if not new_user:
+                raise HTTPException(status_code=500, detail="Could not create user account")
+            
+            # Send email verification if feature is enabled
+            from config import FEATURE_FLAGS
+            if FEATURE_FLAGS.get("enable_email_verification", False):
+                try:
+                    # Generate verification token
+                    verification_token = db.create_email_verification_token(new_user[0])
+                    
+                    # Create verification link
+                    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
+                    verification_link = f"{frontend_url}/verify-email?token={verification_token}"
+                    
+                    # Send verification email
+                    email_service.send_email_verification(email, verification_link)
+                    
+                    access_token = auth.create_access_token(data={"sub": email})
+                    return {
+                        "access_token": access_token, 
+                        "token_type": "bearer", 
+                        "action": "register",
+                        "message": "Welcome! Your account has been created. Please check your email to verify your account.",
+                        "verification_required": True
+                    }
+                except Exception as e:
+                    print(f"Error sending verification email: {e}")
+                    # Don't fail registration if email fails
+                    access_token = auth.create_access_token(data={"sub": email})
+                    return {
+                        "access_token": access_token, 
+                        "token_type": "bearer", 
+                        "action": "register",
+                        "message": "Welcome! Your account has been created.",
+                        "verification_required": False
+                    }
+            else:
+                access_token = auth.create_access_token(data={"sub": email})
+                return {
+                    "access_token": access_token, 
+                    "token_type": "bearer", 
+                    "action": "register",
+                    "message": "Welcome! Your account has been created."
+                }
+        else:
+            raise HTTPException(status_code=400, detail="Invalid action. Use 'login' or 'register'.")
+            
+    except HTTPException:
+        raise  # Re-raise HTTP exceptions
+    except Exception as e:
+        print(f"Unified auth error: {e}")
+        raise HTTPException(status_code=500, detail="Authentication failed. Please try again.")
 
 @app.post("/api/analyze")
 async def analyze_technology(request: AnalysisRequest, token: str = Depends(oauth2_scheme)):
