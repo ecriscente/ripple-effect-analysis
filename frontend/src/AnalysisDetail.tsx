@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { trackAnalysisView } from './analytics';
+import { useAuthenticatedFetch } from './hooks/useAuthenticatedFetch';
 
 interface AnalysisSection {
   title: string;
@@ -23,6 +24,7 @@ const AnalysisDetail = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const { t } = useTranslation();
+  const authenticatedFetch = useAuthenticatedFetch();
 
   const formatMarkdown = (text: string): string => {
     return text
@@ -39,21 +41,9 @@ const AnalysisDetail = () => {
     const fetchAnalysis = async () => {
       setIsLoading(true);
       setError('');
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        setError(t('mustBeLoggedInViewAnalyses'));
-        setIsLoading(false);
-        return;
-      }
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/analysis/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'ngrok-skip-browser-warning': '1',
-          },
-        });
+        const response = await authenticatedFetch(`${import.meta.env.VITE_API_BASE_URL}/api/analysis/${id}`);
 
         if (!response.ok) {
           const errorData = await response.json();

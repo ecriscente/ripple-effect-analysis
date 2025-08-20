@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import i18n from 'i18next'; // Import i18n to get the current language
 import { trackAnalysisSubmission } from './analytics';
 import { captureError, addBreadcrumb } from './sentry';
+import { useAuthenticatedFetch } from './hooks/useAuthenticatedFetch';
 
 // Define the structure of the analysis response
 interface AnalysisSection {
@@ -24,6 +25,7 @@ const AnalysisForm = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const authenticatedFetch = useAuthenticatedFetch();
 
   const handleAnalyze = async () => {
     if (!technology) {
@@ -34,21 +36,13 @@ const AnalysisForm = () => {
     setIsLoading(true);
     setError('');
 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setError(t('mustBeLoggedInAnalyze'));
-      setIsLoading(false);
-      return;
-    }
-
     try {
       addBreadcrumb('Analysis submission started', 'user_action', { technology, language: i18n.language });
       
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/analyze`, {
+      const response = await authenticatedFetch(`${import.meta.env.VITE_API_BASE_URL}/api/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ technology, language: i18n.language }), // Send current language
       });

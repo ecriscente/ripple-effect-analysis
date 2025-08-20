@@ -56,6 +56,8 @@ i18n
           "privacyPolicy": "Privacy Policy",
           "and": "and",
           "mustAgreeToTerms": "You must agree to the Terms of Service and Privacy Policy to register.",
+          "mustBeLoggedIn": "You must be logged in.",
+          "sessionExpiredPleaseLogin": "Your session has expired. Please log in again.",
           "aboutContent": `
 # The Ripple Effect of AI: A Framework for Predicting Humanity's Next Necessities
 
@@ -163,6 +165,8 @@ The question for every innovator is no longer just "What can this technology do?
           "privacyPolicy": "Política de Privacidade",
           "and": "e",
           "mustAgreeToTerms": "Você deve concordar com os Termos de Serviço e Política de Privacidade para se registrar.",
+          "mustBeLoggedIn": "Você deve estar logado.",
+          "sessionExpiredPleaseLogin": "Sua sessão expirou. Por favor, faça login novamente.",
           "aboutContent": `
 # O Efeito Cascata da IA: Uma Estrutura para Prever as Próximas Necessidades da Humanidade
 

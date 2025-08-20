@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuthenticatedFetch } from './hooks/useAuthenticatedFetch';
 
 interface AnalysisSummary {
   0: number; // id
@@ -13,26 +14,15 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const { t } = useTranslation();
+  const authenticatedFetch = useAuthenticatedFetch();
 
   useEffect(() => {
     const fetchAnalyses = async () => {
       setIsLoading(true);
       setError('');
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        setError(t('mustBeLoggedInViewAnalyses'));
-        setIsLoading(false);
-        return;
-      }
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/analyses`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'ngrok-skip-browser-warning': '1',
-          },
-        });
+        const response = await authenticatedFetch(`${import.meta.env.VITE_API_BASE_URL}/api/analyses`);
 
         if (!response.ok) {
           throw new Error(t('failedToFetchAnalyses'));
