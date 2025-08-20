@@ -108,7 +108,7 @@ elif ENVIRONMENT == "production":
     
 # Feature flags for gradual rollout
 FEATURE_FLAGS = {
-    "enable_email_verification": False,  # Enable after implementation
+    "enable_email_verification": True,   # Enabled for testing
     "enable_analysis_limits": True,      # Always enabled for cost protection
     "enable_rate_limiting": True,        # Always enabled for security
     "enable_premium_features": False,    # Future paid features

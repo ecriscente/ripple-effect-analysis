@@ -156,6 +156,76 @@ async def reset_password(request: ResetPasswordRequest):
 
     return {"message": "Password has been reset successfully."}
 
+@app.get("/api/verify-email")
+async def verify_email(token: str):
+    """Verify email address using the token from the verification link"""
+    if not token:
+        raise HTTPException(status_code=400, detail="Verification token is required")
+    
+    user_id = db.verify_email_token(token)
+    if not user_id:
+        raise HTTPException(status_code=400, detail="Invalid or expired verification token")
+    
+    return {"message": "Email verified successfully! You can now log in."}
+
+@app.post("/api/resend-verification")
+async def resend_verification_email(email_request: dict):
+    """Resend verification email to user"""
+    email = email_request.get("email")
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+    
+    # Check if user exists and get verification status
+    user_status = db.get_user_verification_status(email)
+    if not user_status:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user_id, email_verified, current_token = user_status
+    
+    if email_verified:
+        raise HTTPException(status_code=400, detail="Email is already verified")
+    
+    from config import FEATURE_FLAGS
+    if not FEATURE_FLAGS.get("enable_email_verification", False):
+        raise HTTPException(status_code=400, detail="Email verification is not enabled")
+    
+    try:
+        # Generate new verification token
+        verification_token = db.resend_verification_token(user_id)
+        
+        # Create verification link
+        frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
+        verification_link = f"{frontend_url}/verify-email?token={verification_token}"
+        
+        # Send verification email
+        email_service.send_email_verification(email, verification_link)
+        
+        return {"message": "Verification email sent. Please check your inbox."}
+    except Exception as e:
+        print(f"Error resending verification email: {e}")
+        raise HTTPException(status_code=500, detail="Failed to send verification email")
+
+@app.get("/api/verification-status")
+async def get_verification_status(token: str = Depends(oauth2_scheme)):
+    """Get current user's email verification status"""
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    
+    email = auth.verify_token(token, credentials_exception)
+    user_status = db.get_user_verification_status(email)
+    if not user_status:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user_id, email_verified, verification_token = user_status
+    
+    return {
+        "email_verified": email_verified,
+        "has_pending_verification": verification_token is not None
+    }
+
 
 @app.post("/api/register")
 async def register_user(user: UserCreate):
@@ -190,7 +260,35 @@ async def register_user(user: UserCreate):
     if not new_user:
         raise HTTPException(status_code=500, detail="Could not create user account")
     
-    return {"email": new_user[1]}
+    # Send email verification if feature is enabled
+    from config import FEATURE_FLAGS
+    if FEATURE_FLAGS.get("enable_email_verification", False):
+        try:
+            # Generate verification token
+            verification_token = db.create_email_verification_token(new_user[0])
+            
+            # Create verification link
+            frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
+            verification_link = f"{frontend_url}/verify-email?token={verification_token}"
+            
+            # Send verification email
+            email_service.send_email_verification(sanitized_email, verification_link)
+            
+            return {
+                "email": new_user[1],
+                "message": "Account created successfully. Please check your email to verify your account.",
+                "verification_required": True
+            }
+        except Exception as e:
+            print(f"Error sending verification email: {e}")
+            # Don't fail registration if email fails
+            return {
+                "email": new_user[1],
+                "message": "Account created successfully.",
+                "verification_required": False
+            }
+    else:
+        return {"email": new_user[1]}
 
 @app.post("/api/login")
 async def login_user(user: UserLogin):

@@ -4,11 +4,12 @@ import psycopg
 from psycopg import errors
 from psycopg_pool import ConnectionPool
 from passlib.context import CryptContext
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from urllib.parse import quote_plus
 from dotenv import load_dotenv
 import time
 import logging
+import secrets
 
 # Load environment variables
 load_dotenv()
@@ -90,7 +91,10 @@ def create_user_table():
                 ALTER TABLE users 
                 ADD COLUMN IF NOT EXISTS terms_agreed BOOLEAN DEFAULT FALSE,
                 ADD COLUMN IF NOT EXISTS terms_agreed_at TIMESTAMP WITH TIME ZONE,
-                ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+                ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE,
+                ADD COLUMN IF NOT EXISTS email_verification_token TEXT,
+                ADD COLUMN IF NOT EXISTS email_verification_expires_at TIMESTAMP WITH TIME ZONE
                 '''
             )
         conn.commit()
@@ -317,6 +321,69 @@ def update_user_password(user_id, new_password):
             conn.commit()
     finally:
         return_db_connection(conn)
+
+def create_email_verification_token(user_id, expires_hours=24):
+    token = secrets.token_urlsafe(32)
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=expires_hours)
+    
+    conn = get_db()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "UPDATE users SET email_verification_token = %s, email_verification_expires_at = %s WHERE id = %s",
+                (token, expires_at, user_id)
+            )
+            conn.commit()
+            return token
+    finally:
+        return_db_connection(conn)
+
+def verify_email_token(token):
+    conn = get_db()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT id, email_verification_expires_at FROM users WHERE email_verification_token = %s",
+                (token,)
+            )
+            user_data = cursor.fetchone()
+            
+            if not user_data:
+                return None
+                
+            user_id, expires_at = user_data
+            
+            # Check if token has expired
+            if expires_at.tzinfo is None:
+                expires_at = expires_at.replace(tzinfo=timezone.utc)
+            
+            if expires_at < datetime.now(timezone.utc):
+                return None
+                
+            # Mark email as verified and clear token
+            cursor.execute(
+                "UPDATE users SET email_verified = TRUE, email_verification_token = NULL, email_verification_expires_at = NULL WHERE id = %s",
+                (user_id,)
+            )
+            conn.commit()
+            return user_id
+    finally:
+        return_db_connection(conn)
+
+def get_user_verification_status(email):
+    conn = get_db()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                "SELECT id, email_verified, email_verification_token FROM users WHERE email = %s",
+                (email,)
+            )
+            return cursor.fetchone()
+    finally:
+        return_db_connection(conn)
+
+def resend_verification_token(user_id, expires_hours=24):
+    return create_email_verification_token(user_id, expires_hours)
 
 
 if __name__ == "__main__":

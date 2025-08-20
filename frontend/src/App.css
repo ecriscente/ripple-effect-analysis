@@ -386,6 +386,120 @@ body.dark-mode .navbar-links a:hover {
     color: #ffffff;
 }
 
+/* Email Verification Styles */
+.verification-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.verification-card {
+  max-width: 400px;
+  width: 100%;
+  padding: 2rem;
+  background-color: var(--section-bg-light);
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+body.dark-mode .verification-card {
+  background-color: var(--section-bg-dark);
+}
+
+.verification-card h2 {
+  margin-bottom: 2rem;
+  color: var(--primary-color-light);
+  font-size: 1.5rem;
+}
+
+body.dark-mode .verification-card h2 {
+  color: var(--primary-color-dark);
+}
+
+.verification-status {
+  padding: 1rem 0;
+}
+
+.status-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.success-icon {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+body.dark-mode .success-icon {
+  background-color: #155724;
+  color: #d4edda;
+}
+
+.error-icon {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+body.dark-mode .error-icon {
+  background-color: #721c24;
+  color: #f8d7da;
+}
+
+.verification-status h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+}
+
+.status-message {
+  margin: 1rem 0;
+  line-height: 1.5;
+}
+
+.redirect-note {
+  font-size: 0.9rem;
+  color: var(--muted-color-light);
+  margin-top: 1rem;
+}
+
+body.dark-mode .redirect-note {
+  color: var(--muted-color-dark);
+}
+
+.verification-status button {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+  background-color: var(--primary-color-light);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+body.dark-mode .verification-status button {
+  background-color: var(--primary-color-dark);
+}
+
+.verification-status button:hover {
+  background-color: #0056b3;
+}
+
+body.dark-mode .verification-status button:hover {
+  background-color: #0088cc;
+}
+
 /* Auth Form Styles */
 .auth-container {
   max-width: 400px;

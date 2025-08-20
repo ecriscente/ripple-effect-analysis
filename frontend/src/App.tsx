@@ -17,6 +17,7 @@ import { useBackendKeepAlive } from './hooks/useBackendKeepAlive';
 
 import ForgotPassword from './ForgotPassword';
 import ResetPassword from './ResetPassword';
+import EmailVerification from './EmailVerification';
 
 // Component to track page views
 const AnalyticsTracker = () => {
@@ -136,6 +137,7 @@ const AppContent = () => {
           <Route path="/register" element={<Register onRegister={checkAuthStatus} />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/verify-email" element={<EmailVerification />} />
         </Routes>
       </div>
     </>
