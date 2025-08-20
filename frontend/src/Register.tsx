@@ -5,8 +5,7 @@ import { trackUserRegistration } from './analytics';
 import { 
   validateEmail, 
   validatePasswordStrength, 
-  validatePasswordConfirmation,
-  type PasswordStrength as PasswordStrengthType
+  validatePasswordConfirmation
 } from './utils/validation';
 import PasswordStrengthIndicator from './components/PasswordStrength';
 
