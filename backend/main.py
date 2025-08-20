@@ -61,12 +61,14 @@ missing_vars = [var for var in required_env_vars if not os.getenv(var)]
 if missing_vars:
     print(f"Warning: Missing environment variables: {missing_vars}")
 
-frontend_production_url = "https://ripple-effect.erion.dev"
+# Get frontend URL from environment variable, fallback to localhost for dev
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 origins = [
     "http://localhost:5173",      # Your local dev environment
     "https://localhost:5173",     # Local HTTPS
-    frontend_production_url,      # Your production frontend
+    frontend_url,                 # Configurable frontend URL
+    "https://ripple-effect.erion.dev",  # Production frontend
     "https://ripple-effect-analysis.vercel.app"  # Vercel default domain
 ]
 
@@ -146,8 +148,8 @@ async def forgot_password(request: ForgotPasswordRequest):
     expires_at = datetime.utcnow() + timedelta(hours=1)
     db.create_password_reset_token(user[0], token, expires_at)
 
-    # Use production frontend URL for password reset links
-    reset_link = f"{frontend_production_url}/reset-password/{token}"
+    # Use configurable frontend URL for password reset links
+    reset_link = f"{frontend_url}/reset-password/{token}"
     print(f"Password reset link: {reset_link}")  # For debugging purposes
     email_service.send_password_reset_email(request.email, reset_link)
     print(f"Password reset email sent to {request.email}")
@@ -554,7 +556,14 @@ async def get_beta_status_endpoint():
     return get_beta_status()
 
 @app.get("/api/analysis/{analysis_id}")
-async def get_single_analysis(analysis_id: int, token: str = Depends(oauth2_scheme)):
+async def get_single_analysis(analysis_id: str, token: str = Depends(oauth2_scheme)):
+    # Validate UUID format
+    try:
+        import uuid
+        uuid.UUID(analysis_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid analysis ID format")
+    
     credentials_exception = HTTPException(
         status_code=401,
         detail="Could not validate credentials",

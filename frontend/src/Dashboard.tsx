@@ -5,7 +5,7 @@ import { useAuthenticatedFetch } from './hooks/useAuthenticatedFetch';
 import BetaUsageCard from './components/BetaUsageCard';
 
 interface AnalysisSummary {
-  0: number; // id
+  0: string; // id (UUID)
   1: string; // technology
   2: string; // created_at
 }

@@ -73,30 +73,76 @@ def create_user_table():
     conn = get_db()
     try:
         with conn.cursor() as cursor:
-            cursor.execute(
-                '''
-                CREATE TABLE IF NOT EXISTS users (
-                    id SERIAL PRIMARY KEY,
-                    email TEXT NOT NULL UNIQUE,
-                    hashed_password TEXT NOT NULL,
-                    terms_agreed BOOLEAN DEFAULT FALSE,
-                    terms_agreed_at TIMESTAMP WITH TIME ZONE,
-                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            # Check if users table exists and has UUID primary key
+            cursor.execute("""
+                SELECT column_name, data_type 
+                FROM information_schema.columns 
+                WHERE table_name = 'users' AND column_name = 'id'
+            """)
+            result = cursor.fetchone()
+            
+            # If table doesn't exist or doesn't use UUID, recreate all tables
+            if not result or result[1] != 'uuid':
+                print("Recreating database tables with UUID schema...")
+                
+                # Drop existing tables if they exist (fresh start with UUIDs)
+                cursor.execute('DROP TABLE IF EXISTS password_reset_tokens CASCADE;')
+                cursor.execute('DROP TABLE IF EXISTS analyses CASCADE;')
+                cursor.execute('DROP TABLE IF EXISTS users CASCADE;')
+                
+                # Create users table with UUID
+                cursor.execute(
+                    '''
+                    CREATE TABLE users (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        email TEXT NOT NULL UNIQUE,
+                        hashed_password TEXT NOT NULL,
+                        terms_agreed BOOLEAN DEFAULT FALSE,
+                        terms_agreed_at TIMESTAMP WITH TIME ZONE,
+                        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                        email_verified BOOLEAN DEFAULT FALSE,
+                        email_verification_token TEXT,
+                        email_verification_expires_at TIMESTAMP WITH TIME ZONE
+                    )
+                    '''
                 )
-                '''
-            )
-            # Add columns to existing table if they don't exist
-            cursor.execute(
-                '''
-                ALTER TABLE users 
-                ADD COLUMN IF NOT EXISTS terms_agreed BOOLEAN DEFAULT FALSE,
-                ADD COLUMN IF NOT EXISTS terms_agreed_at TIMESTAMP WITH TIME ZONE,
-                ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-                ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE,
-                ADD COLUMN IF NOT EXISTS email_verification_token TEXT,
-                ADD COLUMN IF NOT EXISTS email_verification_expires_at TIMESTAMP WITH TIME ZONE
-                '''
-            )
+                
+                # Create analyses table with UUID
+                cursor.execute(
+                    '''
+                    CREATE TABLE analyses (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        user_id UUID NOT NULL,
+                        technology TEXT NOT NULL,
+                        primary_ripples_title TEXT NOT NULL,
+                        primary_ripples_points TEXT NOT NULL,
+                        secondary_ripples_title TEXT NOT NULL,
+                        secondary_ripples_points TEXT NOT NULL,
+                        synthesis_title TEXT NOT NULL,
+                        synthesis_points TEXT NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES users (id)
+                    )
+                    '''
+                )
+                
+                # Create password_reset_tokens table with UUID
+                cursor.execute(
+                    '''
+                    CREATE TABLE password_reset_tokens (
+                        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                        user_id UUID NOT NULL,
+                        token TEXT NOT NULL UNIQUE,
+                        expires_at TIMESTAMP NOT NULL,
+                        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+                    )
+                    '''
+                )
+                
+                print("✅ All database tables created successfully with UUID schema")
+            else:
+                print("✅ Database tables already exist with UUID schema")
+                
         conn.commit()
     finally:
         return_db_connection(conn)
@@ -137,29 +183,8 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 def create_analysis_table():
-    conn = get_db()
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute(
-                '''
-                CREATE TABLE IF NOT EXISTS analyses (
-                    id SERIAL PRIMARY KEY,
-                    user_id INTEGER NOT NULL,
-                    technology TEXT NOT NULL,
-                    primary_ripples_title TEXT NOT NULL,
-                    primary_ripples_points TEXT NOT NULL,
-                    secondary_ripples_title TEXT NOT NULL,
-                    secondary_ripples_points TEXT NOT NULL,
-                    synthesis_title TEXT NOT NULL,
-                    synthesis_points TEXT NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES users (id)
-                )
-                '''
-            )
-        conn.commit()
-    finally:
-        return_db_connection(conn)
+    # Table is now created in create_user_table() to ensure proper order
+    pass
 
 def get_analyses_by_user_id(user_id):
     conn = get_db()
@@ -241,23 +266,8 @@ def save_analysis(user_id, technology, analysis_data):
         return_db_connection(conn)
 
 def create_password_reset_table():
-    conn = get_db()
-    try:
-        with conn.cursor() as cursor:
-            cursor.execute(
-                '''
-                CREATE TABLE IF NOT EXISTS password_reset_tokens (
-                    id SERIAL PRIMARY KEY,
-                    user_id INTEGER NOT NULL,
-                    token TEXT NOT NULL UNIQUE,
-                    expires_at TIMESTAMP NOT NULL,
-                    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-                )
-                '''
-            )
-        conn.commit()
-    finally:
-        return_db_connection(conn)
+    # Table is now created in create_user_table() to ensure proper order
+    pass
 
 def create_password_reset_token(user_id, token, expires_at):
     conn = get_db()

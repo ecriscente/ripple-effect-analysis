@@ -10,7 +10,7 @@ interface AnalysisSection {
 }
 
 interface AnalysisData {
-  user_id: number;
+  user_id: string;
   technology: string;
   primary_ripples: AnalysisSection;
   secondary_ripples: AnalysisSection;
