@@ -112,6 +112,7 @@ This application implements the "Ripple Effect Analysis" framework - a systemati
 - **Future Phases**: Team collaboration, advanced exports, trend database, public API
 
 ### Key Documentation
+- **ROADMAP.md**: Comprehensive development roadmap with prioritized features, timelines, and business opportunities
 - **achievements.md**: Detailed project completion status and feature history
 - **DEPLOYMENT_PLAN.md**: Comprehensive deployment strategy for free-tier cloud services
 - **NOTES.md**: Strategic roadmap and future development priorities

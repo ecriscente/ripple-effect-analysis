@@ -5,6 +5,8 @@ import i18n from 'i18next'; // Import i18n to get the current language
 import { trackAnalysisSubmission } from './analytics';
 import { captureError, addBreadcrumb } from './sentry';
 import { useAuthenticatedFetch } from './hooks/useAuthenticatedFetch';
+import AnalysisLoader from './components/AnalysisLoader';
+import './components/AnalysisComponents.css';
 
 // Define the structure of the analysis response
 interface AnalysisSection {
@@ -23,9 +25,14 @@ const AnalysisForm = () => {
   const [technology, setTechnology] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showGuidance, setShowGuidance] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
   const authenticatedFetch = useAuthenticatedFetch();
+
+  const handleExampleClick = (example: string) => {
+    setTechnology(example);
+  };
 
   const handleAnalyze = async () => {
     if (!technology) {
@@ -79,26 +86,107 @@ const AnalysisForm = () => {
     }
   };
 
+  if (isLoading) {
+    return <AnalysisLoader />;
+  }
+
   return (
     <div className="analysis-form">
-        <div className="input-section">
-            <input
+      {/* Main Input Section - Priority */}
+      <div className="main-input-section">
+        <h2 className="main-title">{t('enterTechnologyLabel')}</h2>
+        <p className="subtitle">{t('inputGuidanceTextShort')}</p>
+        
+        {/* Quick Examples */}
+        <div className="quick-examples">
+          <span className="example-tag" onClick={() => handleExampleClick(t('exampleQuantumComputing'))}>
+            {t('exampleQuantumComputing')}
+          </span>
+          <span className="example-tag" onClick={() => handleExampleClick(t('exampleBrainInterfaces'))}>
+            {t('exampleBrainInterfaces')}
+          </span>
+          <span className="example-tag" onClick={() => handleExampleClick(t('exampleAutonomousVehicles'))}>
+            {t('exampleAutonomousVehicles')}
+          </span>
+        </div>
+
+        <div className="input-wrapper">
+          <input
+            id="technology-input"
             type="text"
             value={technology}
             onChange={(e) => setTechnology(e.target.value)}
             onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+              if (e.key === 'Enter' && !isLoading) {
                 handleAnalyze();
-                }
+              }
             }}
             placeholder={t('enterTechnology')}
-            maxLength={100} // Added character limit
-            />
-            <button onClick={handleAnalyze} disabled={isLoading}>
-            {isLoading ? t('analyzing') : t('analyze')}
-            </button>
+            maxLength={100}
+            className="technology-input"
+          />
+          <button 
+            onClick={handleAnalyze} 
+            disabled={isLoading || !technology.trim()}
+            className="analyze-button"
+          >
+            {t('analyze')}
+          </button>
         </div>
-        {error && <p className="error">{error}</p>}
+        
+        <div className="input-footer">
+          <span className="character-count">
+            {technology.length}/100
+          </span>
+          <button 
+            className="help-toggle" 
+            onClick={() => setShowGuidance(!showGuidance)}
+          >
+            {showGuidance ? t('hideHelp') : t('showHelp')}
+          </button>
+        </div>
+      </div>
+
+      {error && <div className="error-message">{error}</div>}
+
+      {/* Collapsible Detailed Guidance */}
+      {showGuidance && (
+        <div className="guidance-section">
+          <div className="guidance-content">
+            <div className="input-guidance">
+              <h3>{t('whatToEnter')}</h3>
+              <p>{t('inputGuidanceText')}</p>
+            </div>
+            
+            <div className="output-guidance">
+              <h3>{t('whatYouGet')}</h3>
+              <div className="analysis-preview">
+                <div className="preview-section">
+                  <span className="preview-icon">🌊</span>
+                  <div>
+                    <h4>{t('primaryRipples')}</h4>
+                    <p>{t('primaryRipplesDescription')}</p>
+                  </div>
+                </div>
+                <div className="preview-section">
+                  <span className="preview-icon">🎯</span>
+                  <div>
+                    <h4>{t('secondaryRipples')}</h4>
+                    <p>{t('secondaryRipplesDescription')}</p>
+                  </div>
+                </div>
+                <div className="preview-section">
+                  <span className="preview-icon">💡</span>
+                  <div>
+                    <h4>{t('synthesis')}</h4>
+                    <p>{t('synthesisDescription')}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
