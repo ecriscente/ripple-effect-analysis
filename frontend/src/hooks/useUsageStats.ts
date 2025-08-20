@@ -60,8 +60,8 @@ export const useUsageStats = () => {
       }
     };
 
-    // Only fetch if we have authenticatedFetch and are authenticated
-    if (authenticatedFetch && localStorage.getItem('token')) {
+    // Only fetch if user is authenticated
+    if (localStorage.getItem('token')) {
       fetchUsageStats();
     } else if (isMounted) {
       setIsLoading(false);

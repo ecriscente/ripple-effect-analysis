@@ -1,10 +1,8 @@
-import { useTranslation } from 'react-i18next';
 import { useUsageStats } from '../hooks/useUsageStats';
 import { useBetaStatus } from '../hooks/useBetaStatus';
 import './BetaUsageCard.css';
 
 const BetaUsageCard = () => {
-  const { t } = useTranslation();
   const { usageStats, isLoading: usageLoading } = useUsageStats();
   const { betaStatus, isLoading: betaLoading } = useBetaStatus();
   
