@@ -105,6 +105,10 @@ class ResetPasswordRequest(BaseModel):
 def startup_db_client():
     global usage_limiter
     try:
+        # Initialize database connection pool first
+        db.init_db_pool()
+        print("Database connection pool initialized successfully")
+        
         # Create main database tables first
         db.create_user_table()
         db.create_analysis_table()

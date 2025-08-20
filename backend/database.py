@@ -1,11 +1,14 @@
 import os
 import json
 import psycopg
-from passlib.context import CryptContext
 from psycopg import errors
+from psycopg_pool import ConnectionPool
+from passlib.context import CryptContext
 from datetime import datetime, timezone
 from urllib.parse import quote_plus
 from dotenv import load_dotenv
+import time
+import logging
 
 # Load environment variables
 load_dotenv()
@@ -25,11 +28,49 @@ DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD_ENCODED}@{DB_HOST}:{DB_PORT
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+# Connection pool
+connection_pool = None
+
+def init_db_pool():
+    global connection_pool
+    if connection_pool is None:
+        connection_pool = ConnectionPool(
+            DATABASE_URL,
+            min_size=1,
+            max_size=10,
+            timeout=30,
+            max_idle=300
+        )
+    return connection_pool
+
 def get_db():
-    return psycopg.connect(DATABASE_URL)
+    max_retries = 3
+    retry_delay = 1
+    
+    if connection_pool is None:
+        init_db_pool()
+    
+    for attempt in range(max_retries):
+        try:
+            return connection_pool.getconn()
+        except Exception as e:
+            logging.warning(f"Database connection attempt {attempt + 1} failed: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay)
+                retry_delay *= 2
+            else:
+                raise
+
+def return_db_connection(conn):
+    if connection_pool and conn:
+        try:
+            connection_pool.putconn(conn)
+        except Exception as e:
+            logging.error(f"Error returning connection to pool: {e}")
 
 def create_user_table():
-    with get_db() as conn:
+    conn = get_db()
+    try:
         with conn.cursor() as cursor:
             cursor.execute(
                 '''
@@ -53,12 +94,15 @@ def create_user_table():
                 '''
             )
         conn.commit()
+    finally:
+        return_db_connection(conn)
 
 def create_user(email, password, terms_agreed=False):
     hashed_password = pwd_context.hash(password)
     terms_agreed_at = datetime.now(timezone.utc) if terms_agreed else None
     
-    with get_db() as conn:
+    conn = get_db()
+    try:
         with conn.cursor() as cursor:
             try:
                 cursor.execute(
@@ -72,19 +116,25 @@ def create_user(email, password, terms_agreed=False):
             except errors.UniqueViolation:
                 conn.rollback()
                 return None  # User already exists
+    finally:
+        return_db_connection(conn)
 
 def get_user(email):
-    with get_db() as conn:
+    conn = get_db()
+    try:
         with conn.cursor() as cursor:
             cursor.execute("SELECT id, email, hashed_password FROM users WHERE email = %s", (email,))
             user = cursor.fetchone()
             return user
+    finally:
+        return_db_connection(conn)
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 def create_analysis_table():
-    with get_db() as conn:
+    conn = get_db()
+    try:
         with conn.cursor() as cursor:
             cursor.execute(
                 '''
@@ -104,16 +154,22 @@ def create_analysis_table():
                 '''
             )
         conn.commit()
+    finally:
+        return_db_connection(conn)
 
 def get_analyses_by_user_id(user_id):
-    with get_db() as conn:
+    conn = get_db()
+    try:
         with conn.cursor() as cursor:
             cursor.execute("SELECT id, technology, created_at FROM analyses WHERE user_id = %s ORDER BY created_at DESC", (user_id,))
             analyses = cursor.fetchall()
             return analyses
+    finally:
+        return_db_connection(conn)
 
 def get_analysis_by_id(analysis_id):
-    with get_db() as conn:
+    conn = get_db()
+    try:
         with conn.cursor() as cursor:
             cursor.execute(
                 "SELECT user_id, technology, primary_ripples_title, primary_ripples_points, secondary_ripples_title, secondary_ripples_points, synthesis_title, synthesis_points, created_at FROM analyses WHERE id = %s",
@@ -142,9 +198,12 @@ def get_analysis_by_id(analysis_id):
                 },
                 "created_at": analysis_row[8]
             }
+    finally:
+        return_db_connection(conn)
 
 def save_analysis(user_id, technology, analysis_data):
-    with get_db() as conn:
+    conn = get_db()
+    try:
         with conn.cursor() as cursor:
             try:
                 cursor.execute(
@@ -174,9 +233,12 @@ def save_analysis(user_id, technology, analysis_data):
                 print(f"Database error: {e}")
                 conn.rollback()
                 return None
+    finally:
+        return_db_connection(conn)
 
 def create_password_reset_table():
-    with get_db() as conn:
+    conn = get_db()
+    try:
         with conn.cursor() as cursor:
             cursor.execute(
                 '''
@@ -190,9 +252,12 @@ def create_password_reset_table():
                 '''
             )
         conn.commit()
+    finally:
+        return_db_connection(conn)
 
 def create_password_reset_token(user_id, token, expires_at):
-    with get_db() as conn:
+    conn = get_db()
+    try:
         with conn.cursor() as cursor:
             try:
                 cursor.execute(
@@ -205,9 +270,12 @@ def create_password_reset_token(user_id, token, expires_at):
             except Exception as e:
                 conn.rollback()
                 return None
+    finally:
+        return_db_connection(conn)
 
 def get_user_by_reset_token(token):
-    with get_db() as conn:
+    conn = get_db()
+    try:
         with conn.cursor() as cursor:
             cursor.execute(
                 "SELECT u.id, u.email, u.hashed_password, prt.expires_at FROM users u "
@@ -224,23 +292,31 @@ def get_user_by_reset_token(token):
                 if expires_at > datetime.now(timezone.utc):
                     return user_data[:-1] # Return user data without expiry
             return None
+    finally:
+        return_db_connection(conn)
 
 
 def delete_password_reset_token(token):
-    with get_db() as conn:
+    conn = get_db()
+    try:
         with conn.cursor() as cursor:
             cursor.execute("DELETE FROM password_reset_tokens WHERE token = %s", (token,))
             conn.commit()
+    finally:
+        return_db_connection(conn)
 
 def update_user_password(user_id, new_password):
     hashed_password = pwd_context.hash(new_password)
-    with get_db() as conn:
+    conn = get_db()
+    try:
         with conn.cursor() as cursor:
             cursor.execute(
                 "UPDATE users SET hashed_password = %s WHERE id = %s",
                 (hashed_password, user_id)
             )
             conn.commit()
+    finally:
+        return_db_connection(conn)
 
 
 if __name__ == "__main__":

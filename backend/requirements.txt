@@ -6,6 +6,7 @@ python-jose[cryptography]==3.5.0
 python-dotenv==1.1.1
 google-generativeai==0.8.5
 psycopg[binary]==3.2.9 # Added for PostgreSQL support
+psycopg-pool==3.2.6 # Connection pooling for PostgreSQL
 sendgrid==6.12.4
 sentry-sdk[fastapi]==2.21.0
 pytest==8.3.4
