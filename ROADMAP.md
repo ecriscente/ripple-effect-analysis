@@ -2,6 +2,47 @@
 
 This document outlines the strategic roadmap for improving and expanding the Ripple Effect Analysis application. Items are prioritized based on user impact, technical complexity, and business value.
 
+## **CRITICAL SECURITY FIXES (IMMEDIATE - Before Launch)**
+**Timeline: 1-3 days**
+
+### 🚨 Registration Input Validation (PRIORITY 1)
+**Status:** Not implemented - Critical security vulnerability
+**Impact:** Users can register with empty/invalid emails and passwords
+
+**Required Implementation:**
+- **Frontend Validation**
+  - Real-time email format validation with visual feedback
+  - Password strength meter (minimum 8 characters, mixed case, numbers)
+  - Password confirmation field with mismatch detection
+  - Prevent form submission with invalid data
+  - Clear error messages for all validation failures
+
+- **Backend Validation**
+  - Robust email format validation (regex + basic DNS check)
+  - Password complexity requirements enforcement
+  - Input sanitization to prevent XSS attacks
+  - Proper HTTP error responses with validation details
+  - Rate limiting on registration endpoint
+
+**Acceptance Criteria:**
+- [ ] Cannot register with empty email or password
+- [ ] Cannot register with invalid email format
+- [ ] Cannot register with weak passwords (< 8 chars)
+- [ ] Password confirmation must match
+- [ ] Clear error feedback for all validation failures
+- [ ] Backend validates and sanitizes all inputs
+- [ ] Registration form includes real-time validation
+
+**Technical Tasks:**
+1. Add frontend validation to Register.tsx component
+2. Create password strength validator utility
+3. Add backend validation to /api/register endpoint
+4. Update database constraints if needed
+5. Add comprehensive error handling
+6. Write tests for all validation scenarios
+
+---
+
 ## **High Priority (User Experience & Core Features)**
 
 ### 1. Enhanced Analysis Features

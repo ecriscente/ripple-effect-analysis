@@ -21,6 +21,7 @@ import auth
 import email_service
 from usage_limits import UsageLimiter
 from config import FEATURE_FLAGS, get_beta_status
+from validation import validate_registration_input, raise_validation_error
 
 from fastapi.responses import HTMLResponse
 
@@ -41,7 +42,7 @@ if sentry_dsn:
 
 app = FastAPI()
 
-# Initialize usage limiter
+# Database configuration - initialize usage limiter later
 DB_NAME = os.getenv("POSTGRES_DB", "zeitgeist_db")
 DB_USER = os.getenv("POSTGRES_USER", "user")
 DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "password")
@@ -51,7 +52,8 @@ from urllib.parse import quote_plus
 DB_PASSWORD_ENCODED = quote_plus(DB_PASSWORD)
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD_ENCODED}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-usage_limiter = UsageLimiter(DATABASE_URL)
+# Usage limiter will be initialized after database setup
+usage_limiter = None
 
 # Environment validation
 required_env_vars = ["POSTGRES_HOST", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_DB"]
@@ -101,11 +103,18 @@ class ResetPasswordRequest(BaseModel):
 
 @app.on_event("startup")
 def startup_db_client():
+    global usage_limiter
     try:
+        # Create main database tables first
         db.create_user_table()
         db.create_analysis_table()
         db.create_password_reset_table()
         print("Database tables created successfully")
+        
+        # Now initialize usage limiter with its tables
+        usage_limiter = UsageLimiter(DATABASE_URL)
+        print("Usage limiter initialized successfully")
+        
     except Exception as e:
         print(f"Warning: Database initialization failed: {e}")
         # Don't crash the app, just log the error
@@ -146,15 +155,37 @@ async def reset_password(request: ResetPasswordRequest):
 
 @app.post("/api/register")
 async def register_user(user: UserCreate):
-    if not user.agreedToTerms:
-        raise HTTPException(status_code=400, detail="You must agree to the Terms of Service and Privacy Policy to register")
+    # Comprehensive input validation
+    validation_result = validate_registration_input(
+        email=user.email,
+        password=user.password,
+        agreed_to_terms=user.agreedToTerms
+    )
     
-    db_user = db.get_user(user.email)
+    if not validation_result['valid']:
+        raise_validation_error(
+            "Registration validation failed",
+            validation_result['errors']
+        )
+    
+    # Use sanitized email
+    sanitized_email = validation_result['sanitized_email']
+    
+    # Check if user already exists
+    db_user = db.get_user(sanitized_email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    new_user = db.create_user(email=user.email, password=user.password, terms_agreed=user.agreedToTerms)
+    
+    # Create the user
+    new_user = db.create_user(
+        email=sanitized_email, 
+        password=user.password, 
+        terms_agreed=user.agreedToTerms
+    )
+    
     if not new_user:
-        raise HTTPException(status_code=400, detail="Could not create user")
+        raise HTTPException(status_code=500, detail="Could not create user account")
+    
     return {"email": new_user[1]}
 
 @app.post("/api/login")
@@ -181,8 +212,8 @@ async def analyze_technology(request: AnalysisRequest, token: str = Depends(oaut
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    # Check usage limits if enabled
-    if FEATURE_FLAGS.get("enable_analysis_limits", True):
+    # Check usage limits if enabled and usage limiter is initialized
+    if FEATURE_FLAGS.get("enable_analysis_limits", True) and usage_limiter:
         can_analyze, reason, next_allowed = usage_limiter.can_user_analyze(
             user[0], 
             email_verified=False  # TODO: Check actual email verification status
@@ -223,7 +254,7 @@ async def analyze_technology(request: AnalysisRequest, token: str = Depends(oaut
             raise HTTPException(status_code=500, detail="Failed to save analysis.")
 
         # Record successful analysis usage
-        if FEATURE_FLAGS.get("enable_analysis_limits", True):
+        if FEATURE_FLAGS.get("enable_analysis_limits", True) and usage_limiter:
             usage_limiter.record_analysis(user[0])
 
         sentry_sdk.add_breadcrumb(
@@ -268,7 +299,7 @@ async def get_user_usage(token: str = Depends(oauth2_scheme)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    if FEATURE_FLAGS.get("enable_analysis_limits", True):
+    if FEATURE_FLAGS.get("enable_analysis_limits", True) and usage_limiter:
         usage_stats = usage_limiter.get_user_usage_stats(
             user[0],
             email_verified=False  # TODO: Check actual email verification status

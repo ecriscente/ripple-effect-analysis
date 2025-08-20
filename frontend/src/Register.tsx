@@ -2,18 +2,92 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { trackUserRegistration } from './analytics';
+import { 
+  validateEmail, 
+  validatePasswordStrength, 
+  validatePasswordConfirmation,
+  type PasswordStrength
+} from './utils/validation';
+import PasswordStrength from './components/PasswordStrength';
 
 const Register = ({ onRegister }: { onRegister: () => void }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [error, setError] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [confirmPasswordError, setConfirmPasswordError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    const handleRegister = async () => {
+    // Real-time validation handlers
+    const handleEmailChange = (value: string) => {
+        setEmail(value);
+        const emailValidation = validateEmail(value);
+        setEmailError(emailValidation.isValid ? '' : emailValidation.error || '');
+    };
+
+    const handlePasswordChange = (value: string) => {
+        setPassword(value);
+        const passwordStrength = validatePasswordStrength(value);
+        setPasswordError(passwordStrength.isValid ? '' : 'Password does not meet requirements');
+        
+        // Re-validate confirm password if it exists
+        if (confirmPassword) {
+            const confirmValidation = validatePasswordConfirmation(value, confirmPassword);
+            setConfirmPasswordError(confirmValidation.isValid ? '' : confirmValidation.error || '');
+        }
+    };
+
+    const handleConfirmPasswordChange = (value: string) => {
+        setConfirmPassword(value);
+        const confirmValidation = validatePasswordConfirmation(password, value);
+        setConfirmPasswordError(confirmValidation.isValid ? '' : confirmValidation.error || '');
+    };
+
+    const validateForm = (): boolean => {
+        let isValid = true;
+        
+        // Validate email
+        const emailValidation = validateEmail(email);
+        if (!emailValidation.isValid) {
+            setEmailError(emailValidation.error || '');
+            isValid = false;
+        }
+
+        // Validate password
+        const passwordStrength = validatePasswordStrength(password);
+        if (!passwordStrength.isValid) {
+            setPasswordError('Password does not meet requirements');
+            isValid = false;
+        }
+
+        // Validate password confirmation
+        const confirmValidation = validatePasswordConfirmation(password, confirmPassword);
+        if (!confirmValidation.isValid) {
+            setConfirmPasswordError(confirmValidation.error || '');
+            isValid = false;
+        }
+
+        // Validate terms agreement
         if (!agreedToTerms) {
             setError(t('mustAgreeToTerms'));
+            isValid = false;
+        }
+
+        return isValid;
+    };
+
+    const handleRegister = async () => {
+        setError('');
+        setIsSubmitting(true);
+
+        // Validate form before submission
+        if (!validateForm()) {
+            setIsSubmitting(false);
             return;
         }
 
@@ -23,12 +97,25 @@ const Register = ({ onRegister }: { onRegister: () => void }) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password, agreedToTerms }),
+                body: JSON.stringify({ 
+                    email: email.trim().toLowerCase(), 
+                    password, 
+                    agreedToTerms 
+                }),
             });
 
             if (!response.ok) {
                 const data = await response.json();
-                throw new Error(data.detail || t('failedToRegister'));
+                
+                // Handle validation errors (422 status)
+                if (response.status === 422 && data.detail?.validation_errors) {
+                    const validationErrors = data.detail.validation_errors;
+                    setError(validationErrors.join(', '));
+                } else {
+                    // Handle other errors
+                    setError(data.detail || t('failedToRegister'));
+                }
+                return;
             }
 
             trackUserRegistration('email');
@@ -38,30 +125,75 @@ const Register = ({ onRegister }: { onRegister: () => void }) => {
 
         } catch (err) {
             setError(err instanceof Error ? err.message : t('unknownError'));
+        } finally {
+            setIsSubmitting(false);
         }
     };
+
+    // Get password strength for display
+    const passwordStrength = validatePasswordStrength(password);
+    const isFormValid = validateEmail(email).isValid && 
+                       passwordStrength.isValid && 
+                       validatePasswordConfirmation(password, confirmPassword).isValid && 
+                       agreedToTerms;
 
     return (
         <div className="auth-container">
             <h2>{t('register')}</h2>
-            <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t('email')}
-            />
-            <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={t('password')}
-            />
+            
+            {/* Email field */}
+            <div className="form-field">
+                <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => handleEmailChange(e.target.value)}
+                    placeholder={t('email')}
+                    className={emailError ? 'error-input' : ''}
+                    disabled={isSubmitting}
+                    autoComplete="email"
+                />
+                {emailError && <p className="field-error">{emailError}</p>}
+            </div>
+
+            {/* Password field */}
+            <div className="form-field">
+                <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => handlePasswordChange(e.target.value)}
+                    placeholder={t('password')}
+                    className={passwordError ? 'error-input' : ''}
+                    disabled={isSubmitting}
+                    autoComplete="new-password"
+                />
+                {password && <PasswordStrength strength={passwordStrength} />}
+                {passwordError && <p className="field-error">{passwordError}</p>}
+            </div>
+
+            {/* Confirm Password field */}
+            <div className="form-field">
+                <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => handleConfirmPasswordChange(e.target.value)}
+                    placeholder={t('confirmPassword')}
+                    className={confirmPasswordError ? 'error-input' : ''}
+                    disabled={isSubmitting}
+                    autoComplete="new-password"
+                />
+                {confirmPasswordError && <p className="field-error">{confirmPasswordError}</p>}
+                {confirmPassword && !confirmPasswordError && (
+                    <p className="field-success">✓ Passwords match</p>
+                )}
+            </div>
+
             <div className="terms-agreement">
                 <label>
                     <input
                         type="checkbox"
                         checked={agreedToTerms}
                         onChange={(e) => setAgreedToTerms(e.target.checked)}
+                        disabled={isSubmitting}
                     />
                     <span>
                         {t('agreeToTerms')}{' '}
@@ -75,9 +207,15 @@ const Register = ({ onRegister }: { onRegister: () => void }) => {
                     </span>
                 </label>
             </div>
-            <button onClick={handleRegister} disabled={!agreedToTerms}>
-                {t('register')}
+            
+            <button 
+                onClick={handleRegister} 
+                disabled={!isFormValid || isSubmitting}
+                className={isFormValid ? 'valid-form' : ''}
+            >
+                {isSubmitting ? 'Creating Account...' : t('register')}
             </button>
+            
             {error && <p className="error">{error}</p>}
         </div>
     );

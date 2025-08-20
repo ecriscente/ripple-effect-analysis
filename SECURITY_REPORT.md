@@ -13,7 +13,63 @@ This security assessment identifies critical vulnerabilities and provides action
 
 ## Critical Security Issues (Fix Immediately)
 
-### 🚨 1. Sequential ID Exposure (HIGH RISK)
+### 🚨 1. Missing Input Validation - Registration (CRITICAL RISK)
+**Severity:** Critical  
+**CVSS Score:** 8.1 (High)  
+**Impact:** Account creation bypass, data integrity, potential system abuse
+
+**Issue:**
+- Users can register with empty email and password fields
+- No email format validation on frontend or backend
+- No password strength requirements (minimum length, complexity)
+- No password confirmation field to prevent typos
+- No input sanitization for malicious content
+
+**Evidence:**
+```javascript
+// Frontend allows these invalid registrations:
+{
+  "email": "",           // Empty email accepted
+  "password": "",        // Empty password accepted
+  "agreedToTerms": true
+}
+
+{
+  "email": "not-an-email",     // Invalid format accepted
+  "password": "1",             // Weak password accepted
+  "agreedToTerms": true
+}
+```
+
+**Attack Scenarios:**
+- Mass creation of invalid accounts flooding the database
+- Users accidentally creating accounts with typos in email
+- Password spraying attacks with weak passwords
+- Data pollution with malformed email addresses
+
+**Business Impact:**
+- Support burden from users unable to access their accounts
+- Database bloat with invalid user records
+- Potential compliance issues with data quality requirements
+- Security incidents from compromised weak passwords
+
+**Immediate Remediation:**
+```javascript
+// Frontend validation
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const passwordMinLength = 8;
+const requireConfirmPassword = true;
+
+// Backend validation
+- Email format validation
+- Password strength requirements
+- Input sanitization
+- Duplicate email prevention
+```
+
+---
+
+### 🚨 2. Sequential ID Exposure (HIGH RISK)
 **Severity:** Critical  
 **CVSS Score:** 7.1 (High)  
 **Impact:** Information disclosure, business intelligence leakage
@@ -49,7 +105,7 @@ CREATE TABLE analyses (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), ...);
 
 ---
 
-### 🚨 2. Missing Email Verification (MEDIUM-HIGH RISK)
+### 🚨 3. Missing Email Verification (MEDIUM-HIGH RISK)
 **Severity:** Medium-High  
 **CVSS Score:** 6.4 (Medium)  
 **Impact:** Account integrity, spam potential, support burden
@@ -87,7 +143,7 @@ unverified_accounts_table + email_verification_tokens_table
 
 ## High Priority Issues (Fix Within 2 Weeks)
 
-### ⚠️ 3. No Rate Limiting (HIGH RISK for Launch)
+### ⚠️ 4. No Rate Limiting (HIGH RISK for Launch)
 **Severity:** Medium-High  
 **CVSS Score:** 6.1 (Medium)
 
@@ -112,7 +168,7 @@ LOGIN_ATTEMPTS_MAX = 5       # Per 15 minutes
 
 ---
 
-### ⚠️ 4. Input Validation Gaps (MEDIUM RISK)
+### ⚠️ 5. Input Validation Gaps (MEDIUM RISK)
 **Severity:** Medium  
 **CVSS Score:** 5.3 (Medium)
 
@@ -138,7 +194,7 @@ email: "user@localhost"  // Invalid domain
 
 ---
 
-### ⚠️ 5. Error Information Leakage (MEDIUM RISK)
+### ⚠️ 6. Error Information Leakage (MEDIUM RISK)
 **Severity:** Medium  
 **CVSS Score:** 4.7 (Medium)
 
@@ -159,18 +215,18 @@ email: "user@localhost"  // Invalid domain
 
 ## Medium Priority Issues (Fix Within 1 Month)
 
-### 🔍 6. Account Security Features Missing
+### 🔍 7. Account Security Features Missing
 - No account lockout after failed attempts
 - Password reset has no attempt limits  
 - No session management (force logout)
 - No suspicious activity alerts
 
-### 🔍 7. Audit Logging Gaps
+### 🔍 8. Audit Logging Gaps
 - No logging of sensitive actions (login, data access)
 - No IP address tracking for suspicious activity
 - No audit trail for administrative actions
 
-### 🔍 8. Infrastructure Security
+### 🔍 9. Infrastructure Security
 - HTTPS enforced but no HSTS headers
 - No CSP (Content Security Policy) headers
 - Missing security headers (X-Frame-Options, etc.)
@@ -233,39 +289,47 @@ GLOBAL_LIMITS = {
 ## Implementation Roadmap
 
 ### Phase 1: Critical Fixes (1-2 weeks)
-1. **Replace SERIAL IDs with UUIDs**
+1. **Add Registration Input Validation (PRIORITY 1)**
+   - Frontend validation with real-time feedback
+   - Email format validation (regex + DNS check)
+   - Password strength requirements (8+ chars, mixed case, numbers)
+   - Password confirmation field
+   - Backend validation with proper error messages
+   - Input sanitization to prevent XSS
+
+2. **Replace SERIAL IDs with UUIDs**
    - Database migration script
    - Frontend URL updates
    - API endpoint modifications
 
-2. **Implement Email Verification**
+3. **Implement Email Verification**
    - Verification email templates
    - Token-based verification system
    - Frontend verification flow
 
-3. **Add Launch Protection Limits**
+4. **Add Launch Protection Limits**
    - Per-user analysis limits
    - Rate limiting middleware
    - Usage tracking system
 
 ### Phase 2: Security Hardening (2-4 weeks)
-4. **Enhanced Input Validation**
+5. **Enhanced Input Validation**
    - Content sanitization
    - Stricter email validation
    - Technology input filtering
 
-5. **Improved Error Handling**
+6. **Improved Error Handling**
    - Generic error messages
    - Proper logging without leakage
    - Development/production mode separation
 
 ### Phase 3: Advanced Security (1-2 months)
-6. **Account Security Features**
+7. **Account Security Features**
    - Account lockout policies
    - Session management
    - Suspicious activity detection
 
-7. **Infrastructure Security**
+8. **Infrastructure Security**
    - Security headers implementation
    - Enhanced monitoring and alerting
    - Regular security scans
@@ -292,10 +356,11 @@ GLOBAL_LIMITS = {
 ## Recommendations for Launch
 
 ### Immediate Actions (Before Public Launch)
-1. ✅ **Implement UUIDs** - Prevents business intelligence leakage
-2. ✅ **Add analysis limits** - Protects from cost overruns  
-3. ✅ **Email verification** - Ensures legitimate users
-4. ✅ **Basic rate limiting** - Prevents abuse
+1. 🚨 **Add registration validation** - Prevents invalid accounts and security issues
+2. ✅ **Implement UUIDs** - Prevents business intelligence leakage
+3. ✅ **Add analysis limits** - Protects from cost overruns  
+4. ✅ **Email verification** - Ensures legitimate users
+5. ✅ **Basic rate limiting** - Prevents abuse
 
 ### Launch Strategy
 1. **Soft launch** with 5 analyses/month limit
