@@ -6,9 +6,9 @@ import {
   validateEmail, 
   validatePasswordStrength, 
   validatePasswordConfirmation,
-  type PasswordStrength
+  type PasswordStrength as PasswordStrengthType
 } from './utils/validation';
-import PasswordStrength from './components/PasswordStrength';
+import PasswordStrengthIndicator from './components/PasswordStrength';
 
 const Register = ({ onRegister }: { onRegister: () => void }) => {
     const [email, setEmail] = useState('');
@@ -166,7 +166,7 @@ const Register = ({ onRegister }: { onRegister: () => void }) => {
                     disabled={isSubmitting}
                     autoComplete="new-password"
                 />
-                {password && <PasswordStrength strength={passwordStrength} />}
+                {password && <PasswordStrengthIndicator strength={passwordStrength} />}
                 {passwordError && <p className="field-error">{passwordError}</p>}
             </div>
 
