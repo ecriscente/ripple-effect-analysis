@@ -133,7 +133,7 @@ def is_beta_active() -> bool:
     # For now, assume we're in beta
     return True
 
-def get_user_tier(user_id: int, email_verified: bool = False) -> str:
+def get_user_tier(user_id: str, email_verified: bool = False) -> str:
     """
     Determine user tier based on current mode (beta/launch) and user status
     """

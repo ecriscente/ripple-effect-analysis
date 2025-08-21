@@ -20,7 +20,7 @@ class UsageLimiter:
             with conn.cursor() as cursor:
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS user_usage (
-                        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+                        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
                         last_analysis_at TIMESTAMP WITH TIME ZONE,
                         analyses_this_hour INTEGER DEFAULT 0,
                         analyses_this_day INTEGER DEFAULT 0,
@@ -43,7 +43,7 @@ class UsageLimiter:
                 """)
             conn.commit()
     
-    def can_user_analyze(self, user_id: int, email_verified: bool = False) -> Tuple[bool, str, Optional[datetime]]:
+    def can_user_analyze(self, user_id: str, email_verified: bool = False) -> Tuple[bool, str, Optional[datetime]]:
         """
         Check if user can perform an analysis
         
@@ -112,7 +112,7 @@ class UsageLimiter:
                 
                 return True, "Analysis allowed", None
     
-    def record_analysis(self, user_id: int) -> None:
+    def record_analysis(self, user_id: str) -> None:
         """Record that user has performed an analysis"""
         now = datetime.now(timezone.utc)
         
@@ -163,7 +163,7 @@ class UsageLimiter:
                 """)
             conn.commit()
     
-    def get_user_usage_stats(self, user_id: int, email_verified: bool = False) -> Dict:
+    def get_user_usage_stats(self, user_id: str, email_verified: bool = False) -> Dict:
         """Get current usage statistics for a user"""
         user_tier = get_user_tier(user_id, email_verified)
         
