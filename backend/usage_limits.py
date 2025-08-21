@@ -18,6 +18,19 @@ class UsageLimiter:
         """Create usage tracking tables if they don't exist"""
         with psycopg.connect(self.db_url) as conn:
             with conn.cursor() as cursor:
+                # Check if users table exists before creating usage tables
+                cursor.execute("""
+                    SELECT EXISTS (
+                        SELECT FROM information_schema.tables 
+                        WHERE table_name = 'users'
+                    )
+                """)
+                users_table_exists = cursor.fetchone()[0]
+                
+                if not users_table_exists:
+                    print("Warning: Users table doesn't exist yet. Skipping usage table creation.")
+                    return
+                    
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS user_usage (
                         user_id UUID REFERENCES users(id) ON DELETE CASCADE,
@@ -42,6 +55,10 @@ class UsageLimiter:
                     )
                 """)
             conn.commit()
+    
+    def ensure_usage_tables_exist(self):
+        """Retry creating usage tables (call after main tables are created)"""
+        self._init_usage_tables()
     
     def can_user_analyze(self, user_id: str, email_verified: bool = False) -> Tuple[bool, str, Optional[datetime]]:
         """

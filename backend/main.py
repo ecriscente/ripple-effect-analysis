@@ -128,6 +128,8 @@ def startup_db_client():
         
         # Now initialize usage limiter with its tables
         usage_limiter = UsageLimiter(DATABASE_URL)
+        # Ensure usage tables are created after main tables exist
+        usage_limiter.ensure_usage_tables_exist()
         print("Usage limiter initialized successfully")
         
     except Exception as e:
