@@ -12,7 +12,7 @@ from config import ANALYSIS_LIMITS, get_user_tier, get_analysis_limit, get_coold
 class UsageLimiter:
     def __init__(self, db_url: str):
         self.db_url = db_url
-        self._init_usage_tables()
+        # Tables are now created by migrations, no need to create them here
     
     def _init_usage_tables(self):
         """Create usage tracking tables if they don't exist"""

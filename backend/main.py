@@ -22,6 +22,7 @@ import email_service
 from usage_limits import UsageLimiter
 from config import FEATURE_FLAGS, get_beta_status
 from validation import validate_registration_input, raise_validation_error
+from migrate import run_migrations
 
 from fastapi.responses import HTMLResponse
 
@@ -120,16 +121,16 @@ def startup_db_client():
         db.init_db_pool()
         print("Database connection pool initialized successfully")
         
-        # Create main database tables first
-        db.create_user_table()
-        db.create_analysis_table()
-        db.create_password_reset_table()
-        print("Database tables created successfully")
+        # Run database migrations (creates all tables and handles schema updates)
+        print("🚀 Running database migrations...")
+        migration_success = run_migrations()
+        if migration_success:
+            print("✅ Database migrations completed successfully")
+        else:
+            print("⚠️ Database migrations encountered issues, but continuing...")
         
-        # Now initialize usage limiter with its tables
+        # Initialize usage limiter (migrations should have created the tables)
         usage_limiter = UsageLimiter(DATABASE_URL)
-        # Ensure usage tables are created after main tables exist
-        usage_limiter.ensure_usage_tables_exist()
         print("Usage limiter initialized successfully")
         
     except Exception as e:
@@ -592,7 +593,8 @@ async def health_check():
     """Simple health check endpoint for keep-alive monitoring services."""
     try:
         # Test database connection
-        db.create_user_table()
+        conn = db.get_db()
+        db.return_db_connection(conn)
         return {
             "status": "healthy",
             "timestamp": datetime.utcnow().isoformat(),
