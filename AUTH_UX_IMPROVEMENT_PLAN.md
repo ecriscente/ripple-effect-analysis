@@ -557,7 +557,7 @@ curl -X POST http://localhost:8000/api/auth \
 ```
 Error: Failed to fetch
 Fix: Ensure backend is running on correct port
-Check: VITE_API_BASE_URL in frontend/.env
+Check: VITE_API_URL in frontend/.env
 ```
 
 **2. CORS Issues**

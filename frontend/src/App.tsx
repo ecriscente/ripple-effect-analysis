@@ -173,7 +173,7 @@ const AppContent = () => {
   
   // Activate keep-alive during business hours
   if (isBusinessHours) {
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://ripple-effect-analysis.onrender.com';
+    const apiBaseUrl = import.meta.env.VITE_API_URL || 'https://ripple-effect-analysis.onrender.com';
     useBackendKeepAlive(apiBaseUrl, 600000); // 10 minutes
   }
 

@@ -40,7 +40,7 @@ export const useBetaStatus = () => {
       // Create new fetch promise
       betaStatusPromise = (async () => {
         try {
-          const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://ripple-effect-analysis.onrender.com';
+          const apiBaseUrl = import.meta.env.VITE_API_URL || 'https://ripple-effect-analysis.onrender.com';
           const response = await fetch(`${apiBaseUrl}/api/beta-status`);
           
           if (!response.ok) {

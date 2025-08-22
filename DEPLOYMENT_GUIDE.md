@@ -29,7 +29,7 @@ This guide walks you through deploying your Ripple Effect Analysis app using **1
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
 3. **Add Environment Variables**:
-   - `VITE_API_BASE_URL` = `https://your-app-name.onrender.com` (we'll get this from Render)
+   - `VITE_API_URL` = `https://your-app-name.onrender.com` (we'll get this from Render)
    - `VITE_GA_MEASUREMENT_ID` = `your-google-analytics-id`
    - `VITE_SENTRY_DSN` = `your-sentry-frontend-dsn`
 4. **Deploy** - Vercel will give you a URL like `https://ripple-effect-analysis.vercel.app`
@@ -65,7 +65,7 @@ This guide walks you through deploying your Ripple Effect Analysis app using **1
 
 1. **Go back to Vercel**
 2. **Update Environment Variable**:
-   - `VITE_API_BASE_URL` = `https://your-backend-url.onrender.com` (from step 2)
+   - `VITE_API_URL` = `https://your-backend-url.onrender.com` (from step 2)
 3. **Redeploy** frontend
 
 ## 🔄 **Automatic Deployment**

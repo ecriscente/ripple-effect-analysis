@@ -46,7 +46,7 @@ const AnalysisForm = () => {
     try {
       addBreadcrumb('Analysis submission started', 'user_action', { technology, language: i18n.language });
       
-      const response = await authenticatedFetch(`${import.meta.env.VITE_API_BASE_URL}/api/analyze`, {
+      const response = await authenticatedFetch(`${import.meta.env.VITE_API_URL}/api/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

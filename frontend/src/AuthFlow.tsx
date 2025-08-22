@@ -42,7 +42,7 @@ const AuthFlow = ({ onAuth, initialMode }: AuthFlowProps) => {
       setIsLoading(true);
       setError('');
       
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/check-user`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/check-user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: emailToCheck.trim().toLowerCase() }),
@@ -108,7 +108,7 @@ const AuthFlow = ({ onAuth, initialMode }: AuthFlowProps) => {
       setIsLoading(true);
       setError('');
 
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

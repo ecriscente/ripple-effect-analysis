@@ -23,7 +23,7 @@ const Dashboard = () => {
       setError('');
 
       try {
-        const response = await authenticatedFetch(`${import.meta.env.VITE_API_BASE_URL}/api/analyses`);
+        const response = await authenticatedFetch(`${import.meta.env.VITE_API_URL}/api/analyses`);
 
         if (!response.ok) {
           throw new Error(t('failedToFetchAnalyses'));

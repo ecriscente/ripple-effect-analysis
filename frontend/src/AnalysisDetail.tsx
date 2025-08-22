@@ -43,7 +43,7 @@ const AnalysisDetail = () => {
       setError('');
 
       try {
-        const response = await authenticatedFetch(`${import.meta.env.VITE_API_BASE_URL}/api/analysis/${id}`);
+        const response = await authenticatedFetch(`${import.meta.env.VITE_API_URL}/api/analysis/${id}`);
 
         if (!response.ok) {
           const errorData = await response.json();

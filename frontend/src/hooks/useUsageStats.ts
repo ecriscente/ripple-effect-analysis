@@ -34,7 +34,7 @@ export const useUsageStats = () => {
       }
 
       try {
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://ripple-effect-analysis.onrender.com';
+        const apiBaseUrl = import.meta.env.VITE_API_URL || 'https://ripple-effect-analysis.onrender.com';
         const response = await authenticatedFetch(`${apiBaseUrl}/api/usage`);
 
         if (!response.ok) {
