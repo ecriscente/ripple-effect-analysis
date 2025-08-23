@@ -75,10 +75,14 @@ const Navbar = ({ isAuthenticated, handleLogout, theme, toggleTheme }: NavbarPro
         {isAuthenticated ? (
           <>
             <Link to="/dashboard" onClick={closeMenu}>{t('dashboard')}</Link>
+            <Link to="/contact" onClick={closeMenu}>{t('contact')}</Link>
             <Link to="/" onClick={() => { handleLogout(); closeMenu(); }}>{t('logout')}</Link>
           </>
         ) : (
-          <Link to="/auth" onClick={closeMenu}>{t('signIn')}</Link>
+          <>
+            <Link to="/contact" onClick={closeMenu}>{t('contact')}</Link>
+            <Link to="/auth" onClick={closeMenu}>{t('signIn')}</Link>
+          </>
         )}
         <button onClick={toggleTheme} className="theme-toggle-button">
           {theme === 'light' ? t('darkMode') : t('lightMode')}

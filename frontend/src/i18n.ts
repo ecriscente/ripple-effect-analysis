@@ -11,6 +11,7 @@ i18n
           "subtitle": "A Framework for Predicting Humanity's Next Necessities",
           "home": "Home",
           "dashboard": "Dashboard",
+          "contact": "Contact",
           "logout": "Logout",
           "login": "Login",
           "loggingIn": "Logging in...",
@@ -132,6 +133,23 @@ i18n
             "message": "🚀 You're part of our exclusive beta! Help us optimize for the full launch.",
             "dismiss": "Dismiss"
           },
+          "contactPage": {
+            "title": "Contact",
+            "subtitle": "Have questions, feedback, or want to collaborate? I'd love to hear from you.",
+            "getInTouch": "Get in Touch",
+            "description": "Whether you have questions about the platform, feedback to share, or partnership ideas, feel free to reach out. I personally read and respond to every message.",
+            "email": "Email",
+            "responseTime": "📅 Typical response time: 24-48 hours",
+            "commonQuestions": "Common Questions",
+            "faq": {
+              "question1": "How does the Ripple Effect Analysis work?",
+              "answer1": "Our AI analyzes emerging technologies through two lenses: direct technological capabilities (Primary Ripples) and human reactions to those changes (Secondary Ripples). The business opportunities emerge at their intersection.",
+              "question2": "Can I use this for commercial purposes?",
+              "answer2": "The platform is designed for business use, including entrepreneurs, innovation teams, and strategists. However, please review our Terms of Service for specific usage rights. The AI-generated analyses are provided for informational purposes and should be used as one input among many for business decisions.",
+              "question3": "Is there an API or enterprise version?",
+              "answer3": "I'm currently exploring enterprise features and API access. If you're interested in these capabilities for your organization, please reach out to discuss your specific needs."
+            }
+          },
           "aboutContent": `
 # The Ripple Effect of AI: A Framework for Predicting Humanity's Next Necessities
 
@@ -194,6 +212,7 @@ The question for every innovator is no longer just "What can this technology do?
           "subtitle": "Uma Estrutura para Prever as Próximas Necessidades da Humanidade",
           "home": "Início",
           "dashboard": "Painel",
+          "contact": "Contato",
           "logout": "Sair",
           "login": "Entrar",
           "loggingIn": "Entrando...",
@@ -314,6 +333,23 @@ The question for every innovator is no longer just "What can this technology do?
           "betaBanner": {
             "message": "🚀 Você faz parte do nosso beta exclusivo! Nos ajude a otimizar para o lançamento completo.",
             "dismiss": "Dispensar"
+          },
+          "contactPage": {
+            "title": "Contato",
+            "subtitle": "Tem dúvidas, feedback ou quer colaborar? Adoraria ouvir de você.",
+            "getInTouch": "Entre em Contato",
+            "description": "Seja com dúvidas sobre a plataforma, feedback para compartilhar ou ideias de parceria, sinta-se à vontade para entrar em contato. Leio e respondo pessoalmente todas as mensagens.",
+            "email": "Email",
+            "responseTime": "📅 Tempo de resposta típico: 24-48 horas",
+            "commonQuestions": "Perguntas Frequentes",
+            "faq": {
+              "question1": "Como funciona a Análise do Efeito Cascata?",
+              "answer1": "Nossa IA analisa tecnologias emergentes através de duas lentes: capacidades tecnológicas diretas (Ondas Primárias) e reações humanas a essas mudanças (Ondas Secundárias). As oportunidades de negócio emergem na interseção entre elas.",
+              "question2": "Posso usar isso para fins comerciais?",
+              "answer2": "A plataforma foi projetada para uso comercial, incluindo empreendedores, equipes de inovação e estrategistas. No entanto, consulte nossos Termos de Serviço para direitos específicos de uso. As análises geradas por IA são fornecidas para fins informativos e devem ser usadas como uma das várias entradas para decisões de negócios.",
+              "question3": "Existe uma API ou versão empresarial?",
+              "answer3": "Atualmente estou explorando recursos empresariais e acesso à API. Se você tem interesse nessas funcionalidades para sua organização, entre em contato para discutirmos suas necessidades específicas."
+            }
           },
           "aboutContent": `
 # O Efeito Cascata da IA: Uma Estrutura para Prever as Próximas Necessidades da Humanidade
