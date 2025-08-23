@@ -56,9 +56,16 @@ const AnalysisForm = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
+        
+        // Handle session expiration gracefully - don't report to Sentry or set error
+        if (response.status === 401 && errorData.error === 'session_expired') {
+          // User is already being redirected to login, just return silently
+          return;
+        }
+        
         const errorMessage = t(errorData.detail) || t('failedToFetchAnalysis');
         
-        // Report API errors to Sentry
+        // Report API errors to Sentry (but not session expiration)
         captureError(new Error(`Analysis API Error: ${errorMessage}`), {
           technology,
           language: i18n.language,

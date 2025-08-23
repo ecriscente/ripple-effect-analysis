@@ -459,9 +459,13 @@ async def analyze_technology(request: AnalysisRequest, token: str = Depends(oaut
     
     # Check usage limits if enabled and usage limiter is initialized
     if FEATURE_FLAGS.get("enable_analysis_limits", True) and usage_limiter:
+        # Get user's email verification status
+        user_verification = db.get_user_verification_status(email)
+        email_verified = user_verification[1] if user_verification else False
+        
         can_analyze, reason, next_allowed = usage_limiter.can_user_analyze(
             user[0], 
-            email_verified=False  # TODO: Check actual email verification status
+            email_verified=email_verified
         )
         
         if not can_analyze:
@@ -545,9 +549,13 @@ async def get_user_usage(token: str = Depends(oauth2_scheme)):
         raise HTTPException(status_code=404, detail="User not found")
     
     if FEATURE_FLAGS.get("enable_analysis_limits", True) and usage_limiter:
+        # Get user's email verification status
+        user_verification = db.get_user_verification_status(email)
+        email_verified = user_verification[1] if user_verification else False
+        
         usage_stats = usage_limiter.get_user_usage_stats(
             user[0],
-            email_verified=False  # TODO: Check actual email verification status
+            email_verified=email_verified
         )
         return usage_stats
     else:

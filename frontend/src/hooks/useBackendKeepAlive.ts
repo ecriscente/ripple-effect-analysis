@@ -7,18 +7,17 @@ export const useBackendKeepAlive = (apiBaseUrl: string, interval: number = 60000
   useEffect(() => {
     const pingBackend = async () => {
       try {
-        const response = await fetch(`${apiBaseUrl}/health`, {
+        await fetch(`${apiBaseUrl}/health`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
         });
         
-        if (response.ok) {
-          console.log('Backend keep-alive ping successful');
-        }
+        // Ping successful - no logging needed in production
       } catch (error) {
-        console.error('Backend keep-alive ping failed:', error);
+        // Keep-alive ping failed - this could be logged if needed for debugging
+        // console.error('Backend keep-alive ping failed:', error);
       }
     };
 

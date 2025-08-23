@@ -37,8 +37,6 @@ export const initSentry = () => {
       return event;
     },
   });
-
-  console.log('Sentry initialized successfully');
 };
 
 // Error boundary for React components

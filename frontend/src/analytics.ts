@@ -15,11 +15,9 @@ export const trackPageView = (pagePath: string, pageTitle?: string) => {
 // Track custom events
 export const trackEvent = (eventName: string, parameters?: Record<string, any>) => {
   if (!window.gtag) {
-    console.warn('gtag not available');
     return;
   }
 
-  console.log('Tracking event:', eventName, parameters);
   window.gtag('event', eventName, {
     event_category: 'engagement',
     event_label: eventName,

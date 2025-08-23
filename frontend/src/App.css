@@ -1139,8 +1139,9 @@ body.dark-mode .cta-primary:hover {
 }
 
 body.dark-mode .cta-secondary {
-  color: var(--primary-color-dark);
-  border-color: var(--primary-color-dark);
+  color: var(--primary-color-dark) !important;
+  border-color: var(--primary-color-dark) !important;
+  background: transparent !important;
 }
 
 .cta-secondary:hover {
@@ -1254,8 +1255,9 @@ body.dark-mode .preview-item p {
 }
 
 body.dark-mode .toggle-article-btn {
-  color: var(--primary-color-dark);
-  border-color: var(--primary-color-dark);
+  color: var(--primary-color-dark) !important;
+  border-color: var(--primary-color-dark) !important;
+  background: transparent !important;
 }
 
 .toggle-article-btn:hover {

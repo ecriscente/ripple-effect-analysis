@@ -54,6 +54,16 @@ body.dark-mode .technology-input:focus {
   border-color: #4a90e2;
 }
 
+body.dark-mode .help-toggle {
+  color: #00aaff !important;
+  background: none !important;
+}
+
+body.dark-mode .help-toggle:hover {
+  background: #00aaff !important;
+  color: #121212 !important;
+}
+
 /* Fallback for systems with dark mode preference */
 @media (prefers-color-scheme: dark) {
   .subtitle {

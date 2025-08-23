@@ -17,6 +17,7 @@ export const useUsageStats = () => {
   const [usageStats, setUsageStats] = useState<UsageStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
   const authenticatedFetch = useAuthenticatedFetch();
 
   useEffect(() => {
@@ -71,7 +72,11 @@ export const useUsageStats = () => {
     return () => {
       isMounted = false;
     };
-  }, [authenticatedFetch]); // Only depend on authenticatedFetch
+  }, [authenticatedFetch, refreshKey]); // Add refreshKey to dependencies
 
-  return { usageStats, isLoading, error };
+  const refresh = () => {
+    setRefreshKey(prev => prev + 1);
+  };
+
+  return { usageStats, isLoading, error, refresh };
 };

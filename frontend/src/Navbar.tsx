@@ -24,7 +24,12 @@ const Navbar = ({ isAuthenticated, handleLogout, theme, toggleTheme }: NavbarPro
   };
 
   const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    i18n.changeLanguage(event.target.value);
+    const newLanguage = event.target.value;
+    
+    // Explicitly save to localStorage immediately
+    localStorage.setItem('language', newLanguage);
+    
+    i18n.changeLanguage(newLanguage);
     closeMenu(); // Close menu after language selection
   };
 
@@ -50,14 +55,11 @@ const Navbar = ({ isAuthenticated, handleLogout, theme, toggleTheme }: NavbarPro
         <Link to="/" onClick={closeMenu}>{t('zeitgeistEngine')}</Link>
       </div>
       
-      {/* Show auth buttons prominently on mobile when not authenticated */}
+      {/* Show auth button prominently on mobile when not authenticated */}
       {!isAuthenticated && (
         <div className="mobile-auth-buttons">
-          <Link to="/login" className="mobile-login-btn" onClick={closeMenu}>
-            {t('login')}
-          </Link>
-          <Link to="/auth" className="mobile-register-btn" onClick={closeMenu}>
-            {t('register')}
+          <Link to="/auth" className="mobile-auth-btn" onClick={closeMenu}>
+            {t('signIn')}
           </Link>
         </div>
       )}
@@ -76,10 +78,7 @@ const Navbar = ({ isAuthenticated, handleLogout, theme, toggleTheme }: NavbarPro
             <Link to="/" onClick={() => { handleLogout(); closeMenu(); }}>{t('logout')}</Link>
           </>
         ) : (
-          <>
-            <Link to="/login" onClick={closeMenu}>{t('login')}</Link>
-            <Link to="/auth" onClick={closeMenu}>{t('register')}</Link>
-          </>
+          <Link to="/auth" onClick={closeMenu}>{t('signIn')}</Link>
         )}
         <button onClick={toggleTheme} className="theme-toggle-button">
           {theme === 'light' ? t('darkMode') : t('lightMode')}

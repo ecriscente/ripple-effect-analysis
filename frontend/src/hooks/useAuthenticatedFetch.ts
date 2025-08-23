@@ -28,7 +28,18 @@ export const useAuthenticatedFetch = () => {
     if (response.status === 401) {
       localStorage.removeItem('token');
       navigate('/login');
-      throw new Error(t('sessionExpiredPleaseLogin'));
+      // Return a special response instead of throwing to prevent Sentry errors
+      return new Response(
+        JSON.stringify({ 
+          error: 'session_expired', 
+          message: t('sessionExpiredPleaseLogin') 
+        }),
+        { 
+          status: 401, 
+          statusText: 'Session Expired',
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     return response;

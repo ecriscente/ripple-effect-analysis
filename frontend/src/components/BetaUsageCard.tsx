@@ -3,7 +3,7 @@ import { useBetaStatus } from '../hooks/useBetaStatus';
 import './BetaUsageCard.css';
 
 const BetaUsageCard = () => {
-  const { usageStats, isLoading: usageLoading } = useUsageStats();
+  const { usageStats, isLoading: usageLoading, refresh } = useUsageStats();
   const { betaStatus, isLoading: betaLoading } = useBetaStatus();
   
   const isLoading = usageLoading || betaLoading;
@@ -108,6 +108,22 @@ const BetaUsageCard = () => {
       {usageStats.user_tier === 'beta_free' && (
         <div className="upgrade-hint">
           💡 Verify your email for higher limits!
+          <br />
+          <button 
+            onClick={refresh} 
+            className="refresh-button"
+            style={{ 
+              marginTop: '8px', 
+              fontSize: '12px', 
+              padding: '4px 8px',
+              background: 'transparent',
+              border: '1px solid currentColor',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Already verified? Refresh
+          </button>
         </div>
       )}
     </div>

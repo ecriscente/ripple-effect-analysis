@@ -163,7 +163,11 @@ const Home = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
 
 const AppContent = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState(() => {
+    // Initialize theme from localStorage to prevent flash of light mode
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme || 'light';
+  });
   const navigate = useNavigate();
 
   // Keep backend alive during business hours
@@ -196,7 +200,6 @@ const AppContent = () => {
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
-    document.body.classList.toggle('dark-mode', newTheme === 'dark');
     trackThemeToggle(newTheme);
   };
 
@@ -205,16 +208,36 @@ const AppContent = () => {
     initSentry();
     
     checkAuthStatus();
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    setTheme(savedTheme);
-    document.body.classList.toggle('dark-mode', savedTheme === 'dark');
 
-    // Load and set language from localStorage
-    const savedLanguage = localStorage.getItem('language') || 'en';
-    i18n.changeLanguage(savedLanguage);
+    // Load and set language from localStorage or detect browser language
+    const savedLanguage = localStorage.getItem('language');
+    
+    if (savedLanguage) {
+      // User has previously set a preference, use it
+      i18n.changeLanguage(savedLanguage);
+    } else {
+      // First time user - detect browser language
+      const detectBrowserLanguage = () => {
+        // Check navigator.language and navigator.languages for Portuguese
+        const browserLang = navigator.language.toLowerCase();
+        const browserLangs = navigator.languages?.map(lang => lang.toLowerCase()) || [];
+        
+        // Check if browser prefers Portuguese
+        if (browserLang.startsWith('pt') || browserLangs.some(lang => lang.startsWith('pt'))) {
+          return 'pt';
+        }
+        
+        return 'en'; // Default fallback
+      };
+      
+      const detectedLanguage = detectBrowserLanguage();
+      i18n.changeLanguage(detectedLanguage);
+    }
   }, []);
 
+  // Apply theme class to body and save to localStorage whenever theme changes
   useEffect(() => {
+    document.body.classList.toggle('dark-mode', theme === 'dark');
     localStorage.setItem('theme', theme);
   }, [theme]);
 

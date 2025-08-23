@@ -47,9 +47,9 @@
   gap: 8px;
 }
 
-.beta-badge {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+.beta-usage-card .beta-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
   padding: 2px 8px;
   border-radius: 12px;
   font-size: 11px;
