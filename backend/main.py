@@ -142,7 +142,6 @@ def startup_db_client():
 @app.post("/api/forgot-password")
 async def forgot_password(request: ForgotPasswordRequest):
     user = db.get_user(request.email)
-    print(f"User found: {user}")  # For debugging purposes
     if not user:
         # Still return a success message to prevent email enumeration
         return {"message": "If an account with that email exists, a password reset link has been sent."}
@@ -153,9 +152,7 @@ async def forgot_password(request: ForgotPasswordRequest):
 
     # Use configurable frontend URL for password reset links
     reset_link = f"{frontend_url}/reset-password/{token}"
-    print(f"Password reset link: {reset_link}")  # For debugging purposes
     email_service.send_password_reset_email(request.email, reset_link)
-    print(f"Password reset email sent to {request.email}")
 
     return {"message": "If an account with that email exists, a password reset link has been sent."}
 

@@ -38,11 +38,9 @@ def validate_technology(technology: str, lang: str = 'en') -> bool:
     """
     validation_prompt_template = _read_prompt_from_file('validate_technology.txt', lang)
     validation_prompt = validation_prompt_template.format(technology=technology)
-    print(f"Validation Prompt: {validation_prompt}")  # Debugging line
     try:
         response = model.generate_content(validation_prompt)
         answer = response.text.strip().lower()
-        print(f"LLM Response: {answer}")  # Debugging line
         return answer in ['yes', 'sim']
     except Exception as e:
         print(f"Error during technology validation: {e}")

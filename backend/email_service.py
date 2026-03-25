@@ -10,15 +10,11 @@ def send_password_reset_email(to_email: str, reset_link: str):
         html_content=f'Please click the following link to reset your password: <a href="{reset_link}">{reset_link}</a>'
     )
     try:
-        print(f"sendgrid api key: {os.environ.get('SENDGRID_API_KEY')}")
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-        print(f"Sending email to {to_email} with reset link: {reset_link}")
         response = sg.send(message)
-        print(f'SendGrid response status code: {response.status_code}')
         return response
     except Exception as e:
-        print(f"Error sending email: {e}")
-        print(e)
+        print(f"Error sending email: {type(e).__name__}")
         return None
 
 def send_advanced_analysis_request_email(user_email: str, technology: str):
@@ -31,10 +27,9 @@ def send_advanced_analysis_request_email(user_email: str, technology: str):
     try:
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
-        print(f'SendGrid response status code: {response.status_code}')
         return response
     except Exception as e:
-        print(f"Error sending email: {e}")
+        print(f"Error sending email: {type(e).__name__}")
         return None
 
 def send_email_verification(to_email: str, verification_link: str):
@@ -70,10 +65,8 @@ def send_email_verification(to_email: str, verification_link: str):
     )
     try:
         sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-        print(f"Sending verification email to {to_email}")
         response = sg.send(message)
-        print(f'SendGrid response status code: {response.status_code}')
         return response
     except Exception as e:
-        print(f"Error sending verification email: {e}")
+        print(f"Error sending verification email: {type(e).__name__}")
         return None
